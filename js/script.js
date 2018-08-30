@@ -1,6 +1,6 @@
 chrome.extension.onMessage.addListener(function(request) {
   chrome.storage.sync.get(null, function(items) {
-		// 現在フォーカスが与えられている要素を取得する
+	  // 現在フォーカスが与えられている要素を取得する
 	 	const active_element = document.activeElement;
 
 		 // フォーカスしている部分を取得

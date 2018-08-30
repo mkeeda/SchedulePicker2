@@ -1,5 +1,5 @@
- // 通常予定の日時処理
- const getNormalSche = function(input) {
+// 通常予定の日時処理
+const getNormalSche = function(input) {
   const date = new Date(input);
   const hour = ("0" + date.getHours()).slice(-2);
   const minute = ("0" + date.getMinutes()).slice(-2);

@@ -1,0 +1,44 @@
+{
+  "name": "日報メイカー",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "description": "ハッカソン2018",
+  "icons": {
+    "16": "icons/Artboard@2x.png",
+    "48": "icons/Artboard@2x.png",
+    "128": "icons/Artboard@2x.png"
+  },
+  "permissions": [
+    "storage",
+    "https://bozuman.cybozu.com/*",
+    "tabs",
+    "background",
+    "contextMenus"
+  ],
+  "content_scripts": [{
+    "matches": ["https://bozuman.cybozu.com/*"],
+    "js": [
+      "js/moment.js",
+      "js/jquery-3.2.1.min.js",
+      "js/formatschedule.js",
+      "js/makehtml.js",
+      "js/script.js"
+    ]
+  }],
+  "background": {
+    "matches": ["https://bozuman.cybozu.com/*"],
+    "scripts": [
+      "js/jquery-3.2.1.min.js",
+      "js/background.js"
+    ]
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "chrome_style": true,
+    "open_in_tab": true
+  },
+  "browser_action": {
+    "default_title": "SchedulePicker",
+    "default_popup": "popup/popup.html"
+  }
+}

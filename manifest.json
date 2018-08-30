@@ -20,6 +20,7 @@
     "js": [
       "js/moment.js",
       "js/jquery-3.2.1.min.js",
+      "js/getSchedule.js",
       "js/formatschedule.js",
       "js/makehtml.js",
       "js/script.js"

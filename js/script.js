@@ -22,6 +22,7 @@ chrome.extension.onMessage.addListener(function(request) {
 		//date変数にそれぞれの場合の日付を代入
 		switch (request) {
 			case 'Today':
+			case 'Form':
 				date = today;
 				break;
 			case 'Tomorrow':
@@ -39,23 +40,25 @@ chrome.extension.onMessage.addListener(function(request) {
 			const type = items.secret;
 			const form = items.form;
 
-			if(null == form){
-				// スケジュールの挿入部分
-				switch (request) {
-					case 'Today':
-						target.innerHTML += makehtml(schedule, type, today.format('YYYY-MM-DD'));
-						break;
-					case 'Tomorrow':
-						target.innerHTML += makehtml(schedule, type, tomorrow.format('YYYY-MM-DD'));
-						break;
-					default:
-						target.innerHTML += makehtml(schedule, type, selected_date);
-						break;
-				}
-			}else{
-				//target.insertAdjacentHTML("afterbegin", makeForm(form, schedule, type, today));
-				target.innerHTML += makeForm(form, schedule, type, today);
+			// スケジュールの挿入部分
+			switch (request) {
+				case 'Today':
+					target.innerHTML += makehtml(schedule, type, today.format('YYYY-MM-DD'));
+					break;
+				case 'Tomorrow':
+					target.innerHTML += makehtml(schedule, type, tomorrow.format('YYYY-MM-DD'));
+					break;
+				case 'Form':
+					getSchedule(tomorrow).done(function(tomorrow_json) {
+						const tomorrow_schedule = formatSchedule($(tomorrow_json));
+						target.innerHTML += makeForm(form, schedule, tomorrow_schedule, type, today, tomorrow);
+					});
+					break;
+				default:
+					target.innerHTML += makehtml(schedule, type, selected_date);
+					break;
 			}
+			
 		});
 	});
 });

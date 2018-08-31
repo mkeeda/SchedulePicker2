@@ -10,6 +10,15 @@ var parentId = chrome.contextMenus.create({
 });
 
 chrome.contextMenus.create({
+	"title" : "template",
+	"type" : "normal",
+	"contexts" : ["all"],
+	"parentId": parentId,
+	"onclick" : Click("Form"),
+	"id": "form_id"
+});
+
+chrome.contextMenus.create({
 	"title" : "Today",
 	"type" : "normal",
 	"contexts" : ["all"],

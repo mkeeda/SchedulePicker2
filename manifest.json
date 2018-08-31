@@ -26,7 +26,8 @@
       "js/checkScheduleType.js",
       "js/setColor.js",
       "js/makehtml.js",
-      "js/script.js"
+      "js/script.js",
+      "js/form.js"
     ]
   }],
   "background": {

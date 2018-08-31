@@ -37,18 +37,24 @@ chrome.extension.onMessage.addListener(function(request) {
 			const schedule = formatSchedule($(json));
 			// オプション画面の非公開予定の値
 			const type = items.secret;
+			const form = items.form;
 
-			// スケジュールの挿入部分
-			switch (request) {
-				case 'Today':
-					target.innerHTML += makehtml(schedule, type, today.format('YYYY-MM-DD'));
-					break;
-				case 'Tomorrow':
-					target.innerHTML += makehtml(schedule, type, tomorrow.format('YYYY-MM-DD'));
-					break;
-				default:
-					target.innerHTML += makehtml(schedule, type, selected_date);
-					break;
+			if(null == form){
+				// スケジュールの挿入部分
+				switch (request) {
+					case 'Today':
+						target.innerHTML += makehtml(schedule, type, today.format('YYYY-MM-DD'));
+						break;
+					case 'Tomorrow':
+						target.innerHTML += makehtml(schedule, type, tomorrow.format('YYYY-MM-DD'));
+						break;
+					default:
+						target.innerHTML += makehtml(schedule, type, selected_date);
+						break;
+				}
+			}else{
+				//target.insertAdjacentHTML("afterbegin", makeForm(form, schedule, type, today));
+				target.innerHTML += makeForm(form, schedule, type, today);
 			}
 		});
 	});

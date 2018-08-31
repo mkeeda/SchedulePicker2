@@ -1,6 +1,6 @@
 {
-  "name": "日報メイカー",
-  "version": "1.0.0",
+  "name": "SchedulePicker",
+  "version": "2.0.0",
   "manifest_version": 2,
   "description": "ハッカソン2018",
   "icons": {

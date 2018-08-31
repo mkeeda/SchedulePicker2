@@ -24,6 +24,7 @@
       "js/formatSchedule.js",
       "js/sortSchedule.js",
       "js/checkScheduleType.js",
+      "js/setColor.js",
       "js/makehtml.js",
       "js/script.js"
     ]

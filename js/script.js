@@ -12,19 +12,20 @@ chrome.extension.onMessage.addListener(function(request) {
 
 		// 日付処理
 		let date;
-		const today = moment().format('YYYY-MM-DD');
-		const tomorrow = moment(today).add(1, 'd').format('YYYY-MM-DD');
-
+		const today = moment();
+		let tomorrow;
+		// todayが金曜なら、tomorrowを翌週の月曜にする
+		if (moment().day() === 5) tomorrow = moment(today).add(3, 'd');
+		else tomorrow = moment(today).add(1, 'd');
 		// オプション画面の日付情報を取得
 		const selected_date = items.select;
-
 		//date変数にそれぞれの場合の日付を代入
 		switch (request) {
 			case 'Today':
-				date = moment(today);
+				date = today;
 				break;
 			case 'Tomorrow':
-				date = moment(today).add(1, 'd');
+				date = tomorrow;
 				break;
 			default:
 				date = moment(selected_date);
@@ -40,10 +41,10 @@ chrome.extension.onMessage.addListener(function(request) {
 			// スケジュールの挿入部分
 			switch (request) {
 				case 'Today':
-					target.innerHTML += makehtml(schedule, type, today);
+					target.innerHTML += makehtml(schedule, type, today.format('YYYY-MM-DD'));
 					break;
 				case 'Tomorrow':
-					target.innerHTML += makehtml(schedule, type, tomorrow);
+					target.innerHTML += makehtml(schedule, type, tomorrow.format('YYYY-MM-DD'));
 					break;
 				default:
 					target.innerHTML += makehtml(schedule, type, selected_date);

@@ -4,9 +4,9 @@
   "manifest_version": 2,
   "description": "ハッカソン2018",
   "icons": {
-    "16": "icons/Artboard@2x.png",
-    "48": "icons/Artboard@2x.png",
-    "128": "icons/Artboard@2x.png"
+    "16": "icons/Artboard-n@2x.png",
+    "48": "icons/Artboard-n@2x.png",
+    "128": "icons/Artboard-n@2x.png"
   },
   "permissions": [
     "storage",

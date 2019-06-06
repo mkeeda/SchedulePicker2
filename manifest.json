@@ -11,12 +11,16 @@
   "permissions": [
     "storage",
     "https://bozuman.cybozu.com/*",
+    "https://bozuman.s.cybozu.com/*",
     "tabs",
     "background",
     "contextMenus"
   ],
   "content_scripts": [{
-    "matches": ["https://bozuman.cybozu.com/*"],
+    "matches": [
+      "https://bozuman.cybozu.com/*",
+      "https://bozuman.s.cybozu.com/*"
+    ],
     "js": [
       "js/moment.js",
       "js/jquery-3.2.1.min.js",
@@ -31,7 +35,10 @@
     ]
   }],
   "background": {
-    "matches": ["https://bozuman.cybozu.com/*"],
+    "matches": [
+      "https://bozuman.cybozu.com/*",
+      "https://bozuman.s.cybozu.com/*"
+    ],
     "scripts": [
       "js/jquery-3.2.1.min.js",
       "js/background.js"

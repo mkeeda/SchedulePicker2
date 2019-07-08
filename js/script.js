@@ -44,7 +44,10 @@ chrome.extension.onMessage.addListener(function (menuItem) {
                 break;
             }
             default:
-                // TODO myGroupの処理
+                const schedule = (await getMyGroupSchedules()).find(s => {
+                    return s.mygroup_id === menuItem.id;
+                });
+                target.innerHTML += makeHtmlForSoap(schedule.events, true, today.format('YYYY-MM-DD'));
                 break;
         }
     });

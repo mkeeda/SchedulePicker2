@@ -55,3 +55,12 @@ const set_eventMenu = function(plan) {
   plan_text += plan + '</span>';
   return plan_text;
 };
+
+const makeHtmlForSoap = (events, showPrivateFlag, date) => {
+  //FIXME: document.createElementで作ろう！
+  const scheduleTitle = '<div>【' + date + '】の予定</div>';
+  const eventHtmlList = events.map((event) => {
+    return event.detail;
+  });
+  return scheduleTitle + eventHtmlList.join("<br>");
+};

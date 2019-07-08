@@ -60,6 +60,10 @@ const formatDate = (date) => {
   return moment(date).format("HH:mm");
 };
 
+const titleText = (event) => {
+  return `<a href = "https://bozuman.cybozu.com/g/schedule/view.csp?event=${event.id}" >${event.detail}</a>`;
+};
+
 const makeEventHTMLForSOAP = (event) => {
   // FIXME: 繰り返し予定のアイコンを入れたければ入れてください！
 
@@ -68,9 +72,9 @@ const makeEventHTMLForSOAP = (event) => {
     const allDay = set_eventMenu("終日");
     if (event.plan) {
       const planText = set_eventMenu(event.plan);
-      return `${allDay} 00:00-23:59 ${planText} ${event.detail}`;
+      return `${allDay} 00:00-23:59 ${planText} ${titleText(event)}`;
     }
-    return `${allDay} 00:00-23:59 ${event.detail}`;
+    return `${allDay} 00:00-23:59 ${titleText(event)}`;
   }
 
   // 開始時刻のみ指定された予定
@@ -78,9 +82,9 @@ const makeEventHTMLForSOAP = (event) => {
     const startTime = formatDate(event.when.datetimes[0].start);
     if (event.plan) {
       const planText = set_eventMenu(event.plan);
-      return `${startTime} ${planText} ${event.detail}`;
+      return `${startTime} ${planText} ${titleText(event)}`;
     }
-    return `${startTime} ${event.detail}`;
+    return `${startTime} ${titleText(event)}`;
   }
 
   // 開始時刻も終了時刻も指定された予定
@@ -88,9 +92,9 @@ const makeEventHTMLForSOAP = (event) => {
   const endTime = formatDate(event.when.datetimes[0].end);
   if (event.plan) {
     const planText = set_eventMenu(event.plan);
-    return `${startTime}-${endTime} ${planText} ${event.detail}`;
+    return `${startTime}-${endTime} ${planText} ${titleText(event)}`;
   }
-  return `${startTime}-${endTime} ${event.detail}`;
+  return `${startTime}-${endTime} ${titleText(event)}`;
 };
 
 const makeHtmlForSoap = (events, showPrivateFlag, date) => {

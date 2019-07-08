@@ -29,8 +29,8 @@ async function getMyGroups() {
 
 async function getMyGroupSchedule(myGroup) {
     const now = new Date();
-    const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDay());
-    const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDay(), 23, 59, 59);
+    const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
     const events = await garoon.schedule.getEventsByTarget(startDate, endDate, undefined, undefined, myGroup.belong_member);
     const users = await garoon.base.getUsersById(myGroup.belong_member);
 

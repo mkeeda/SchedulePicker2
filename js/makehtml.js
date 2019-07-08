@@ -56,11 +56,52 @@ const set_eventMenu = function(plan) {
   return plan_text;
 };
 
+const formatDate = (date) => {
+  return moment(date).format("HH:mm");
+};
+
+const makeEventHTMLForSOAP = (event) => {
+  // FIXME: 繰り返し予定のアイコンを入れたければ入れてください！
+
+  // 終日予定
+  if (event.allday) {
+    const allDay = set_eventMenu("終日");
+    if (event.plan) {
+      const planText = set_eventMenu(event.plan);
+      return `${allDay} 00:00-23:59 ${planText} ${event.detail}`;
+    }
+    return `${allDay} 00:00-23:59 ${event.detail}`;
+  }
+
+  // 開始時刻のみ指定された予定
+  if (event.start_only) {
+    const startTime = formatDate(event.when.datetimes[0].start);
+    if (event.plan) {
+      const planText = set_eventMenu(event.plan);
+      return `${startTime} ${planText} ${event.detail}`;
+    }
+    return `${startTime} ${event.detail}`;
+  }
+
+  // 開始時刻も終了時刻も指定された予定
+  const startTime = formatDate(event.when.datetimes[0].start);
+  const endTime = formatDate(event.when.datetimes[0].end);
+  if (event.plan) {
+    const planText = set_eventMenu(event.plan);
+    return `${startTime}-${endTime} ${planText} ${event.detail}`;
+  }
+  return `${startTime}-${endTime} ${event.detail}`;
+};
+
 const makeHtmlForSoap = (events, showPrivateFlag, date) => {
   //FIXME: document.createElementで作ろう！
   const scheduleTitle = '<div>【' + date + '】の予定</div>';
-  const eventHtmlList = events.map((event) => {
-    return event.detail;
+
+  // 期間予定は除外する
+  events = events.filter(event => {
+    return event.eventType !== "banner";
   });
+
+  const eventHtmlList = events.map(makeEventHTMLForSOAP);
   return scheduleTitle + eventHtmlList.join("<br>");
 };

@@ -51,12 +51,10 @@ async function getMyGroupSchedule(myGroup) {
 }
 
 async function getMyGroupSchedules() {
-    const groupSchedules = [];
     const myGroups = await getMyGroups();
-    myGroups.map(async g => {
+    const promises = myGroups.map(async g => {
         const events = await getMyGroupSchedule(g);
-        events.map(event => {
-            groupSchedules.push({ "mygroup": g.key, "events": events });
-        });
+        return {"mygroup_id": g.key, "events": events};
     });
+    return Promise.all(promises);
 }

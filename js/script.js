@@ -1,5 +1,4 @@
-const getTomorrowDate = () => {
-    const today = moment();
+const getTomorrowDate = (today) => {
     if (today.day() === 5) {
         return today.add(3, 'd');
     } else {
@@ -13,24 +12,23 @@ chrome.extension.onMessage.addListener(function (menuItem) {
         const target = document.activeElement;
         if (target === null) return;
 
+        const today       = moment();
         switch (menuItem.id) {
             case MYSELF_ID: {
-                const today       = moment();
                 const json        = await getSchedule(today);
                 const schedule    = formatSchedule($(json));
                 target.innerHTML += makehtml(schedule, items.secret, today.format('YYYY-MM-DD'));
                 break;
             }
             case TOMORROW_ID: {
-                const tomorrow    = getTomorrowDate();
+                const tomorrow    = getTomorrowDate(today);
                 const json        = await getSchedule(tomorrow);
                 const schedule    = formatSchedule($(json));
                 target.innerHTML += makehtml(schedule, items.secret, tomorrow.format('YYYY-MM-DD'));
                 break;
             }
             case TEMPLATE_ID: {
-                const today               = moment();
-                const tomorrow            = getTomorrowDate();
+                const tomorrow            = getTomorrowDate(today);
                 const todayJson           = await getSchedule(today);
                 const tomorrowJson        = await getSchedule(tomorrow);
                 const todaySchedule       = formatSchedule($(todayJson));

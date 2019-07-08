@@ -20,12 +20,12 @@ chrome.extension.onMessage.addListener(function(menuItem) {
 		// オプション画面の日付情報を取得
 		const selected_date = items.select;
 		//date変数にそれぞれの場合の日付を代入
-		switch (menuItem.title) { // FIXME menuItem.parentId or menuItem.id で分岐したい
-			case 'Today':
-			case 'Template':
+		switch (menuItem.id) {
+			case TODAY_ID:
+			case TEMPLATE_ID:
 				date = today;
 				break;
-			case 'Tomorrow':
+			case TOMORROW_ID:
 				date = tomorrow;
 				break;
 			default:
@@ -41,14 +41,14 @@ chrome.extension.onMessage.addListener(function(menuItem) {
 			const form = items.form;
 
 			// スケジュールの挿入部分
-			switch (menuItem.title) {  // FIXME menuItem.parentId or menuItem.id で分岐したい
-				case 'Today':
+			switch (menuItem.id) {
+				case TODAY_ID:
 					target.innerHTML += makehtml(schedule, type, today.format('YYYY-MM-DD'));
 					break;
-				case 'Tomorrow':
+				case TOMORROW_ID:
 					target.innerHTML += makehtml(schedule, type, tomorrow.format('YYYY-MM-DD'));
 					break;
-				case 'Template':
+				case TEMPLATE_ID:
 					getSchedule(tomorrow).done(function(tomorrow_json) {
 						const tomorrow_schedule = formatSchedule($(tomorrow_json));
 						target.innerHTML += makeForm(form, schedule, tomorrow_schedule, type, today, tomorrow);

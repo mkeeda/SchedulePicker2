@@ -1,17 +1,10 @@
-const M_ID           = "id";
-const M_TITLE        = "title";
-const M_PARENT_ID    = "parentId";
-
-const ROOT_ID        = "root";
-const TODAY_ID       = "today";
-
 const DEFAULT_MENU_ITEMS = [
     {[M_ID]: ROOT_ID, [M_TITLE]: "SchedulePicker"},
     {[M_ID]: TODAY_ID, [M_TITLE]: "Today", [M_PARENT_ID]: ROOT_ID},
-    {[M_ID]: "form", [M_TITLE]: "Template", [M_PARENT_ID]: ROOT_ID},
-    {[M_ID]: "tomorrow", [M_TITLE]: "Tomorrow", [M_PARENT_ID]: ROOT_ID},
-    {[M_ID]: "select", [M_TITLE]: "Select", [M_PARENT_ID]: ROOT_ID},
-    {[M_ID]: "myself", [M_TITLE]: "自分の予定", [M_PARENT_ID]: TODAY_ID}
+    {[M_ID]: TEMPLATE_ID, [M_TITLE]: "Template", [M_PARENT_ID]: ROOT_ID},
+    {[M_ID]: TOMORROW_ID, [M_TITLE]: "Tomorrow", [M_PARENT_ID]: ROOT_ID},
+    {[M_ID]: SELECT_ID, [M_TITLE]: "Select", [M_PARENT_ID]: ROOT_ID},
+    {[M_ID]: MYSELF_ID, [M_TITLE]: "自分の予定", [M_PARENT_ID]: TODAY_ID}
 ];
 
 const addMenuItem = (item) => {

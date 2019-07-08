@@ -23,7 +23,7 @@
         "https://bozuman.s.cybozu.com/*"
       ],
       "js": [
-        "js/lib/garoon-soap.js",
+        "js/lib/garoon-soap.min.js",
         "js/lib/jquery-3.2.1.min.js",
         "js/lib/moment.js",
         "js/getRequest.js",
@@ -44,7 +44,7 @@
       "https://bozuman.s.cybozu.com/*"
     ],
     "scripts": [
-      "js/lib/garoon-soap.js",
+      "js/lib/garoon-soap.min.js",
       "js/lib/jquery-3.2.1.min.js",
       "js/getRequest.js",
       "js/menuParameter.js",

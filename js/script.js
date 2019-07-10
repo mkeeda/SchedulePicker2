@@ -47,7 +47,8 @@ chrome.extension.onMessage.addListener(function (menuItem) {
                 const schedule = (await getMyGroupSchedules()).find(s => {
                     return s.mygroup_id === menuItem.id;
                 });
-                target.innerHTML += makeHtmlForSoap(schedule.events, true, today.format('YYYY-MM-DD'));
+                const formattedSchedule = formatSchedule([schedule]);
+                target.innerHTML += makehtml(formattedSchedule, items.secret, today.format('YYYY-MM-DD'));
                 break;
         }
     });

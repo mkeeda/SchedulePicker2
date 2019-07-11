@@ -58,20 +58,19 @@ async function getMyGroupSchedule(myGroup) {
     }, []);
 
     const users = await garoon.base.getUsersById(myGroup.belong_member);
-    events.map((event) => {
-        const userIds = event.attendees.map(u => u.id);
-        let participants = "";
-        users.forEach(function (user) {
-            if (userIds.includes(user.key)) {
-                participants += ` ${user.reading.split(" ")[0]} `;
-            }
+    return events.map((event) => {
+        event.participants = [];
+        event.attendees.forEach(participant => {
+           users.forEach(user => {
+              if (participant.id === user.key) {
+                  event.participants.push(participant.name);
+              }
+           });
         });
-        if (participants !== "") {
-            event.subject += ` (${participants})`;
-        }
+        //TODO: スケジュールのタイトルに名前を入れない
+        event.subject += ` (${event.participants.join('、')})`;
         return event;
     });
-    return events;
 }
 
 async function getMyGroupSchedules() {

@@ -12,7 +12,7 @@ chrome.extension.onMessage.addListener(function (menuItem) {
         const target = document.activeElement;
         if (target === null) return;
 
-        const today       = moment();
+        const today = moment();
         switch (menuItem.id) {
             case MYSELF_ID: {
                 const json        = await getSchedule(today);

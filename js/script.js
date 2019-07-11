@@ -44,10 +44,8 @@ chrome.extension.onMessage.addListener(function (menuItem) {
                 break;
             }
             default:
-                const schedule = (await getMyGroupSchedules()).find(s => {
-                    return s.mygroup_id === menuItem.id;
-                });
-                const formattedSchedule = formatSchedule([schedule]);
+                const schedule = await getMyGroupSchedule(menuItem.myGroup);
+                const formattedSchedule = formatSchedule(schedule);
                 target.innerHTML += makehtml(formattedSchedule, items.secret, today.format('YYYY-MM-DD'));
                 break;
         }

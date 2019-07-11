@@ -57,12 +57,12 @@ async function getMyGroupSchedule(myGroup) {
     }, []);
 
     const users = await garoon.base.getUsersById(myGroup.belong_member);
-    return events.map((event) => {
+    events = events.map((event) => {
         event.participants = [];
         event.attendees.forEach(participant => {
            users.forEach(user => {
               if (participant.id === user.key) {
-                  event.participants.push(participant.name);
+                  event.participants.push(participant.name.split(" ")[0]);
               }
            });
         });
@@ -70,13 +70,5 @@ async function getMyGroupSchedule(myGroup) {
         event.subject += ` (${event.participants.join('、')})`;
         return event;
     });
-}
-
-async function getMyGroupSchedules() {
-    const myGroups = await getMyGroups();
-    const promises = myGroups.map(async g => {
-        const events = await getMyGroupSchedule(g);
-        return {"mygroup_id": g.key, "events": events};
-    });
-    return Promise.all(promises);
+    return [{"events": events}];
 }

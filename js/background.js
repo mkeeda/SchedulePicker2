@@ -26,7 +26,7 @@ const addMenuItems = (items) => {
 const setupContextMenus = async () => {
     const myGroups = await getMyGroups();
     const groupMenuItems = myGroups.map(g => {
-        return {[M_ID]: g.key, [M_TITLE]: g.name, [M_PARENT_ID]: TODAY_ID}
+        return {[M_ID]: g.key, [M_TITLE]: g.name, [M_PARENT_ID]: TODAY_ID, "myGroup": g}
     });
     addMenuItems(groupMenuItems);
 };

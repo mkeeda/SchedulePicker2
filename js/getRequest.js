@@ -50,10 +50,9 @@ async function getMyGroupSchedule(myGroup) {
             return event.id === currentEvent.id;
         });
 
-        if (duplicatedEvent) {
-            return uniqueEvents;
+        if (!duplicatedEvent) {
+            uniqueEvents.push(currentEvent);
         }
-        uniqueEvents.push(currentEvent);
         return uniqueEvents;
     }, []);
 

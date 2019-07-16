@@ -10,7 +10,8 @@ chrome.extension.onMessage.addListener(function (menuItem) {
     chrome.storage.sync.get(null, async function (items) {
         // 現在フォーカスが与えられている要素を取得する
         const target = document.activeElement;
-        if (target === null) return;
+        // フォーカスが外れているときactiveElementはnullかbodyを返す
+        if (target === null || target.tagName === "BODY") return;
 
         const today = moment();
         switch (menuItem.id) {

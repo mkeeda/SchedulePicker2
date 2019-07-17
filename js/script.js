@@ -1,4 +1,5 @@
-const getTomorrowDate = (today) => {
+const getTomorrowDate = (todayData) => {
+    const today = moment(todayData);
     if (today.day() === 5) {
         return today.add(3, 'd');
     } else {

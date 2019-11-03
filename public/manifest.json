@@ -1,0 +1,39 @@
+{
+    "name": "SchedulePicker",
+    "version": "3.0.0",
+    "manifest_version": 2,
+    "description": "ガルーンの今日のスケジュール情報を取得して、kintoneスレッドなどに挿入するChrome拡張。ハッカソン2019",
+    "icons": {
+        "16": "icons/Artboard-n@2x.png",
+        "48": "icons/Artboard-n@2x.png",
+        "128": "icons/Artboard-n@2x.png"
+    },
+    "permissions": [
+        "storage",
+        "tabs",
+        "background",
+        "contextMenus",
+        "https://bozuman.cybozu.com/*",
+        "https://bozuman.s.cybozu.com/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": ["https://bozuman.cybozu.com/*", "https://bozuman.s.cybozu.com/*"],
+            "js": ["js/contentscript.js"]
+        }
+    ],
+    "background": {
+        "scripts": ["js/background.js"]
+    },
+    "options_ui": {
+        "page": "options.html",
+        "chrome_style": true,
+        "open_in_tab": true
+    },
+    "browser_action": {
+        "default_title": "SchedulePicker",
+        "default_popup": "popup.html"
+    },
+    "author": "atsusuke murata"
+}
+  

@@ -19,11 +19,11 @@
     "content_scripts": [
         {
             "matches": ["https://bozuman.cybozu.com/*", "https://bozuman.s.cybozu.com/*"],
-            "js": ["js/contentscript.js"]
+            "js": ["js/contentscript.js", "js/vendor.js"]
         }
     ],
     "background": {
-        "scripts": ["js/background.js"]
+        "scripts": ["js/background.js", "js/vendor.js"]
     },
     "options_ui": {
         "page": "options.html",

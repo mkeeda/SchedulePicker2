@@ -9,6 +9,8 @@
         "rootDir": "src",
         "outDir": "dist/js",
         "noEmitOnError": true,
+        "experimentalDecorators": true,
+        "moduleResolution": "node",
         "typeRoots": [ "node_modules/@types" ]
     },
     "exclude": [

@@ -1,12 +1,30 @@
-import { LitElement, html, property, customElement, TemplateResult } from 'lit-element';
+import { LitElement, html, css, property, customElement, TemplateResult } from 'lit-element';
+import './privateschedule';
 
-@customElement('simple-greeting')
-export class SimpleGreeting extends LitElement {
-    @property() name = 'World';
+@customElement('popup-view')
+export class PopupView extends LitElement {
+    @property({ type: Boolean })
+    isInclude = true;
+
+    onClickedCheckbox(e): void {
+        this.isInclude = e.currentTarget.checked;
+    }
 
     render(): TemplateResult {
         return html`
-            <p>Hello, ${this.name}!</p>
+            <main>
+                <private-schedule
+                    .isInclude=${this.isInclude}
+                    .onClickedCheckbox=${this.onClickedCheckbox}
+                ></private-schedule>
+            </main>
         `;
     }
+
+    static styles = css`
+        main {
+            min-width: 320px;
+            max-height: 500px;
+        }
+    `;
 }

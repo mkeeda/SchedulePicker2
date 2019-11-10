@@ -16,6 +16,29 @@ export class PopupView extends LitElement {
     @property({ type: String })
     templateText = '';
 
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    private initProperties = async () => {
+        await new Promise((resolve, reject) => {
+            chrome.storage.sync.get(['isInclude', 'date', 'templateText'], item => {
+                if (item.isInclude != null) {
+                    this.isInclude = item.isInclude;
+                }
+
+                if (item.date != null) {
+                    this.date = item.date;
+                }
+
+                if (item.templateText != null) {
+                    this.templateText = item.template;
+                }
+                console.log(item);
+                resolve();
+            });
+        }).catch(e => {
+            throw e;
+        });
+    };
+
     onClickedCheckbox = (e): void => {
         this.isInclude = e.currentTarget.checked;
     };
@@ -28,13 +51,23 @@ export class PopupView extends LitElement {
         this.templateText = e.currentTarget.textContent;
     };
 
-    onClickedSave = (): void => {
-        console.log(this.isInclude);
-        console.log(this.date);
-        console.log(this.templateText);
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    onClickedSave = async () => {
+        chrome.storage.sync.set(
+            {
+                isInclude: this.isInclude,
+                date: this.date,
+                templateText: this.templateText,
+            },
+            () => {
+                console.log('saved');
+                this.requestUpdate();
+            }
+        );
     };
 
     render(): TemplateResult {
+        console.log('render');
         return html`
             <main>
                 <private-schedule

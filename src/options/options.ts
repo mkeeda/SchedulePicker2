@@ -1,12 +1,11 @@
-import { LitElement, html, property, customElement } from 'lit-element';
+import { LitElement, html, customElement, TemplateResult } from 'lit-element';
+import '../components/settingview';
 
-@customElement('simple-greeting')
-export class SimpleGreeting extends LitElement {
-    @property() name = 'World';
-
-    render() {
+@customElement('option-view')
+export class OptionView extends LitElement {
+    render(): TemplateResult {
         return html`
-            <p>Hello, ${this.name}!</p>
+            <setting-view></setting-view>
         `;
     }
 }

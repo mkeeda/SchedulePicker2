@@ -64,7 +64,6 @@ export class PopupView extends LitElement {
                     templateText: this.templateText,
                 },
                 () => {
-                    console.log('saved');
                     resolve();
                 }
             );
@@ -74,7 +73,6 @@ export class PopupView extends LitElement {
     };
 
     render(): TemplateResult {
-        console.log('render');
         return html`
             <main>
                 <private-schedule

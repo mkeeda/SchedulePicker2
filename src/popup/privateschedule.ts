@@ -23,10 +23,10 @@ export class PrivateSchedule extends LitElement {
         div {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         span {
-            font-size: 15px;
+            font-size: 16px;
         }
     `;
 }

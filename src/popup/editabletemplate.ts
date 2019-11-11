@@ -26,16 +26,17 @@ export class EditableTemplate extends LitElement {
 
     static styles = css`
         .input-form {
-            min-width: 380px;
-            max-width: 500px;
-            min-height: 380px;
-            max-height: 500px;
+            min-width: 400px;
+            max-width: 480px;
+            min-height: 400px;
+            max-height: 480px;
             border: black solid 1px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-size: 16px;
         }
         p {
-            font-size: 15px;
-            margin: 0;
+            font-size: 16px;
+            margin: 0 0 4px 0;
         }
     `;
 }

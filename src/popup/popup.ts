@@ -94,7 +94,7 @@ export class PopupView extends LitElement {
     static styles = css`
         main {
             min-width: 320px;
-            max-height: 500px;
+            max-height: 560px;
         }
     `;
 }

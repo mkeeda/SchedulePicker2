@@ -20,8 +20,7 @@ export class PopupView extends LitElement {
         this.initProperties();
     }
 
-    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    private initProperties = () => {
+    private initProperties = (): void => {
         new Promise((resolve, reject) => {
             chrome.storage.sync.get(['isInclude', 'date', 'templateText'], item => {
                 if (item.isInclude != null) {
@@ -54,8 +53,7 @@ export class PopupView extends LitElement {
         this.templateText = e.currentTarget.textContent;
     };
 
-    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    onClickedSave = () => {
+    onClickedSave = (): void => {
         new Promise((resolve, reject) => {
             chrome.storage.sync.set(
                 {

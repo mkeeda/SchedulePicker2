@@ -3,7 +3,7 @@ import { LitElement, html, css, property, customElement, TemplateResult } from '
 @customElement('editable-template')
 export class EditableTemplate extends LitElement {
     @property({ type: String })
-    date = '';
+    templateText = '';
 
     @property({ type: Object })
     onBlurTemplate = (): never => {
@@ -14,7 +14,12 @@ export class EditableTemplate extends LitElement {
         return html`
             <div>
                 <p>テンプレート</p>
-                <div class="input-form" contenteditable="true" @blur=${this.onBlurTemplate}></div>
+                <div
+                    class="input-form"
+                    contenteditable="true"
+                    .textContent=${this.templateText}
+                    @blur=${this.onBlurTemplate}
+                ></div>
             </div>
         `;
     }

@@ -6,7 +6,6 @@ import './savebutton';
 
 @customElement('popup-view')
 export class PopupView extends LitElement {
-    // TODO: constructorで書き換える
     @property({ type: Boolean })
     isInclude = true;
 
@@ -16,9 +15,14 @@ export class PopupView extends LitElement {
     @property({ type: String })
     templateText = '';
 
+    constructor() {
+        super();
+        this.initProperties();
+    }
+
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    private initProperties = async () => {
-        await new Promise((resolve, reject) => {
+    private initProperties = () => {
+        new Promise((resolve, reject) => {
             chrome.storage.sync.get(['isInclude', 'date', 'templateText'], item => {
                 if (item.isInclude != null) {
                     this.isInclude = item.isInclude;
@@ -29,9 +33,8 @@ export class PopupView extends LitElement {
                 }
 
                 if (item.templateText != null) {
-                    this.templateText = item.template;
+                    this.templateText = item.templateText;
                 }
-                console.log(item);
                 resolve();
             });
         }).catch(e => {
@@ -52,18 +55,22 @@ export class PopupView extends LitElement {
     };
 
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    onClickedSave = async () => {
-        chrome.storage.sync.set(
-            {
-                isInclude: this.isInclude,
-                date: this.date,
-                templateText: this.templateText,
-            },
-            () => {
-                console.log('saved');
-                this.requestUpdate();
-            }
-        );
+    onClickedSave = () => {
+        new Promise((resolve, reject) => {
+            chrome.storage.sync.set(
+                {
+                    isInclude: this.isInclude,
+                    date: this.date,
+                    templateText: this.templateText,
+                },
+                () => {
+                    console.log('saved');
+                    resolve();
+                }
+            );
+        }).catch(e => {
+            throw e;
+        });
     };
 
     render(): TemplateResult {
@@ -75,7 +82,10 @@ export class PopupView extends LitElement {
                     .onClickedCheckbox=${this.onClickedCheckbox}
                 ></private-schedule>
                 <select-date .date=${this.date} .onSelectedDate=${this.onSelectedDate}></select-date>
-                <editable-template .onBlurTemplate=${this.onBlurTemplate}></editable-template>
+                <editable-template
+                    .templateText=${this.templateText}
+                    .onBlurTemplate=${this.onBlurTemplate}
+                ></editable-template>
                 <save-button .onClickedSave=${this.onClickedSave}></save-button>
             </main>
         `;

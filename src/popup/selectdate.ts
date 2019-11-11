@@ -14,7 +14,7 @@ export class SelectDate extends LitElement {
         return html`
             <div>
                 <span>日付：</span>
-                <input class="calendar" type="date" @change=${this.onSelectedDate} />
+                <input class="calendar" type="date" .value=${this.date} @change=${this.onSelectedDate} />
             </div>
         `;
     }

@@ -1,5 +1,6 @@
 import { ScheduleEventType, ContextMenuIds } from './eventtype';
 import ScheduleEventLogic from './scheduleeventslogic';
+import * as util from './util';
 
 const logic = new ScheduleEventLogic();
 
@@ -38,7 +39,7 @@ const setupContextMenu = async (): Promise<void> => {
         switch (info.menuItemId) {
             case ContextMenuIds.MYSELF: {
                 const schedule = await logic.getMySchedule(ScheduleEventType.TODAY);
-                chrome.tabs.sendMessage(tab!.id!, schedule.events);
+                chrome.tabs.sendMessage(tab!.id!, util.sortByTime(schedule.events));
                 break;
             }
             case ContextMenuIds.NEXT_BUSINESS_DAY: {
@@ -51,7 +52,7 @@ const setupContextMenu = async (): Promise<void> => {
             }
             default: {
                 const schedule = await logic.getMyGroupSchedule(ScheduleEventType.TODAY, info.menuItemId);
-                chrome.tabs.sendMessage(tab!.id!, schedule.events);
+                chrome.tabs.sendMessage(tab!.id!, util.sortByTime(schedule.events));
                 break;
             }
         }

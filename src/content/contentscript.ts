@@ -1,11 +1,8 @@
-import ScheduleEventsModel from '../background/scheduleeventsmodel';
+import { StorageKeys } from '../background/eventtype';
 
-const testPromise = async (): Promise<void> => {
-    const model = new ScheduleEventsModel();
-    const resp = await model.getMySchedule();
-    const json = await resp.json();
-    console.log(json);
-};
-
-console.log('echo backgroundddd');
-testPromise();
+chrome.runtime.onMessage.addListener((contextMenuItemName: string) => {
+    chrome.storage.sync.get([StorageKeys.IS_INCLUDE, StorageKeys.DATE, StorageKeys.TEMPLATE_TEXT], item => {
+        console.log(contextMenuItemName);
+        console.log(item);
+    });
+});

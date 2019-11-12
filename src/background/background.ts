@@ -35,7 +35,24 @@ const setupContextMenu = async (): Promise<void> => {
     });
     chrome.contextMenus.onClicked.addListener((info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) => {
         console.log(info);
-        console.log(tab);
+
+        switch (info.menuItemId) {
+            case ContextMenuIds.MYSELF: {
+                chrome.tabs.sendMessage(tab!.id!, ContextMenuIds.MYSELF);
+                break;
+            }
+            case ContextMenuIds.NEXT_BUSINESS_DAY: {
+                chrome.tabs.sendMessage(tab!.id!, ContextMenuIds.NEXT_BUSINESS_DAY);
+                break;
+            }
+            case ContextMenuIds.TEMPLATE: {
+                chrome.tabs.sendMessage(tab!.id!, ContextMenuIds.TEMPLATE);
+                break;
+            }
+            default:
+                chrome.tabs.sendMessage(tab!.id!, 'mygroupの何か');
+                break;
+        }
     });
 };
 

@@ -37,7 +37,7 @@ const setupContextMenu = async (): Promise<void> => {
     chrome.contextMenus.onClicked.addListener(async (info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) => {
         switch (info.menuItemId) {
             case ContextMenuIds.MYSELF: {
-                const schedule = await logic.getMySchedule();
+                const schedule = await logic.getMySchedule(ScheduleEventType.TODAY);
                 chrome.tabs.sendMessage(tab!.id!, schedule.events);
                 break;
             }
@@ -49,9 +49,11 @@ const setupContextMenu = async (): Promise<void> => {
                 chrome.tabs.sendMessage(tab!.id!, ContextMenuIds.TEMPLATE);
                 break;
             }
-            default:
-                chrome.tabs.sendMessage(tab!.id!, 'mygroupの何か');
+            default: {
+                const schedule = await logic.getMyGroupSchedule(ScheduleEventType.TODAY, info.menuItemId);
+                chrome.tabs.sendMessage(tab!.id!, schedule);
                 break;
+            }
         }
     });
 };

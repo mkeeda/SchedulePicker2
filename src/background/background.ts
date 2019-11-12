@@ -1,5 +1,7 @@
 import { ScheduleEventType, ContextMenuIds } from './eventtype';
-import ScheduleEventsModel from './scheduleeventsmodel';
+import ScheduleEventLogic from './scheduleeventslogic';
+
+const logic = new ScheduleEventLogic();
 
 const createContextMenuItems = async (): Promise<any> => {
     const defaultMenuItems = [
@@ -10,8 +12,7 @@ const createContextMenuItems = async (): Promise<any> => {
         { id: ContextMenuIds.MYSELF.toString(), title: '自分', parentId: ContextMenuIds.TODAY },
     ];
 
-    const model = new ScheduleEventsModel();
-    const myGroups = await model.getMyGroups();
+    const myGroups = await logic.getMyGroups();
     const myGroupMenuItems = myGroups.map(g => {
         return { id: g.key, title: g.name, parentId: ContextMenuIds.TODAY };
     });

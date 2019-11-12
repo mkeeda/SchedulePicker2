@@ -2,7 +2,12 @@ import GaroonService from './garoonservice';
 import { ScheduleEventType } from './eventtype';
 import * as base from 'garoon-soap/dist/type/base';
 
-export default class ScheduleEventsModel {
+interface ScheduleEventsLogic {
+    getMySchedule(): Promise<any>;
+    getMyGroups(): Promise<base.MyGroupType[]>;
+}
+
+export default class ScheduleEventsLogicImpl {
     private garoonService = new GaroonService();
 
     private findDateFromType(type: ScheduleEventType): any {

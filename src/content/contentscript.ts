@@ -1,8 +1,8 @@
 import { StorageKeys } from '../background/eventtype';
 
-chrome.runtime.onMessage.addListener((contextMenuItemName: string) => {
+chrome.runtime.onMessage.addListener((schedule: any) => {
     chrome.storage.sync.get([StorageKeys.IS_INCLUDE, StorageKeys.DATE, StorageKeys.TEMPLATE_TEXT], item => {
-        console.log(contextMenuItemName);
         console.log(item);
+        console.log(schedule);
     });
 });

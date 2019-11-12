@@ -34,12 +34,11 @@ const setupContextMenu = async (): Promise<void> => {
     contextMenuItems.forEach(item => {
         addMenu(item);
     });
-    chrome.contextMenus.onClicked.addListener((info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) => {
-        console.log(info);
-
+    chrome.contextMenus.onClicked.addListener(async (info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) => {
         switch (info.menuItemId) {
             case ContextMenuIds.MYSELF: {
-                chrome.tabs.sendMessage(tab!.id!, ContextMenuIds.MYSELF);
+                const schedule = await logic.getMySchedule();
+                chrome.tabs.sendMessage(tab!.id!, schedule.events);
                 break;
             }
             case ContextMenuIds.NEXT_BUSINESS_DAY: {

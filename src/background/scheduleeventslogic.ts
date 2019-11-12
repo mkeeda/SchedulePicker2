@@ -22,8 +22,7 @@ export default class ScheduleEventsLogicImpl {
     async getMySchedule(): Promise<any> {
         const date = this.findDateFromType(ScheduleEventType.TODAY);
         const respStream = await this.garoonService.getScheduleEvents(date.start.toISOString(), date.end.toISOString());
-        const respJson = await respStream.json();
-        return respJson;
+        return respStream.json();
     }
 
     async getMyGroups(): Promise<base.MyGroupType[]> {

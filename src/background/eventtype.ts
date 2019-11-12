@@ -11,3 +11,9 @@ export enum ContextMenuIds {
     TEMPLATE = 'template',
     MYSELF = 'myself',
 }
+
+export enum StorageKeys {
+    IS_INCLUDE = 'isInclude',
+    DATE = 'date',
+    TEMPLATE_TEXT = 'templateText',
+}

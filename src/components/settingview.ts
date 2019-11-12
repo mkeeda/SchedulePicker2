@@ -1,4 +1,5 @@
 import { LitElement, html, css, property, customElement, TemplateResult } from 'lit-element';
+import { StorageKeys } from '../background/eventtype';
 import './privateschedule';
 import './selectdate';
 import './editabletemplate';
@@ -21,7 +22,7 @@ export class SettingView extends LitElement {
     }
 
     private initProperties = (): void => {
-            chrome.storage.sync.get(['isInclude', 'date', 'templateText'], item => {
+        chrome.storage.sync.get([StorageKeys.IS_INCLUDE, StorageKeys.DATE, StorageKeys.TEMPLATE_TEXT], item => {
             if (item.isInclude != null) {
                 this.isInclude = item.isInclude;
             }

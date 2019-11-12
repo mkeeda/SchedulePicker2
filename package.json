@@ -6,7 +6,8 @@
   "scripts": {
     "watch": "webpack --config webpack/webpack.dev.js --watch",
     "prod": "webpack --config webpack/webpack.prod.js",
-    "lint": "eslint src/**/*.ts"
+    "lint": "eslint src/**/*.ts",
+    "postinstall": "node src/postinstall.js"
   },
   "repository": {
     "type": "git",

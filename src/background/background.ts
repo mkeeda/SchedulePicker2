@@ -51,7 +51,7 @@ const setupContextMenu = async (): Promise<void> => {
             }
             default: {
                 const schedule = await logic.getMyGroupSchedule(ScheduleEventType.TODAY, info.menuItemId);
-                chrome.tabs.sendMessage(tab!.id!, schedule);
+                chrome.tabs.sendMessage(tab!.id!, schedule.events);
                 break;
             }
         }

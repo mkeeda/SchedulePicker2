@@ -43,6 +43,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         if (targetMyGroups.length === 0) {
             throw new Error('選択したMyグループが存在しません');
         }
+        const groupMemberList = targetMyGroups[0].belong_member;
 
         /*
         [
@@ -53,7 +54,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         ]
         */
         const eventsPerUserList = await Promise.all(
-            targetMyGroups[0].belong_member.map(async userId => {
+            groupMemberList.map(async userId => {
                 const schedule = await this.getMySchedule(type, 'user', userId);
                 return schedule.events;
             })
@@ -67,19 +68,31 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
             mergeEventsList = mergeEventsList.concat(events);
         });
 
-        const events = mergeEventsList.reduce((uniqueEvents: any, currentEvent: any) => {
-            if (!uniqueEvents.some(event => event.id === currentEvent.id)) {
-                uniqueEvents.push(currentEvent);
-            }
-            return uniqueEvents;
-        }, []);
+        const events = mergeEventsList
+            .reduce((uniqueEvents: any, currentEvent: any) => {
+                if (!uniqueEvents.some(event => event.id === currentEvent.id)) {
+                    uniqueEvents.push(currentEvent);
+                }
+                return uniqueEvents;
+            }, [])
+            .map(event => {
+                const participantNameList: string[] = [];
+                event.attendees.forEach((participant: any) => {
+                    groupMemberList.forEach(userId => {
+                        if (participant.id === userId) {
+                            participantNameList.push(participant.name.split(' ')[0]);
+                        }
+                    });
+                });
 
-        console.log('bk');
-        console.log(events);
+                //TODO: スケジュールのタイトルに名前を入れない
+                event.subject += ` (${participantNameList.join('、')})`;
+                return event;
+            });
 
         /*
             {events: [{}, {}, {}....]}
         */
-        return events;
+        return { events: events };
     }
 }

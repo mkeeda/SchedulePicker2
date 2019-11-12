@@ -21,23 +21,18 @@ export class SettingView extends LitElement {
     }
 
     private initProperties = (): void => {
-        new Promise((resolve, reject) => {
             chrome.storage.sync.get(['isInclude', 'date', 'templateText'], item => {
-                if (item.isInclude != null) {
-                    this.isInclude = item.isInclude;
-                }
+            if (item.isInclude != null) {
+                this.isInclude = item.isInclude;
+            }
 
-                if (item.date != null) {
-                    this.date = item.date;
-                }
+            if (item.date != null) {
+                this.date = item.date;
+            }
 
-                if (item.templateText != null) {
-                    this.templateText = item.templateText;
-                }
-                resolve();
-            });
-        }).catch(e => {
-            throw e;
+            if (item.templateText != null) {
+                this.templateText = item.templateText;
+            }
         });
     };
 
@@ -54,19 +49,10 @@ export class SettingView extends LitElement {
     };
 
     onClickedSave = (): void => {
-        new Promise((resolve, reject) => {
-            chrome.storage.sync.set(
-                {
-                    isInclude: this.isInclude,
-                    date: this.date,
-                    templateText: this.templateText,
-                },
-                () => {
-                    resolve();
-                }
-            );
-        }).catch(e => {
-            throw e;
+        chrome.storage.sync.set({
+            isInclude: this.isInclude,
+            date: this.date,
+            templateText: this.templateText,
         });
     };
 

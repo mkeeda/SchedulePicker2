@@ -1,24 +1,40 @@
 import GaroonSoap from 'garoon-soap';
 
 interface GaroonService {
-    getScheduleEvents(url: any, params: any): Promise<any>;
+    getScheduleEvents(rangeStart: string, rangeEnd: string, targetType: string, target: string): Promise<any>;
     getMyGroupVersions(): Promise<any>;
     getMyGroupsByIds(id: string[]): Promise<any>;
 }
 
-class GaroonServiceImpl implements GaroonService {
-    private BASE_URL = `${document.domain}/g/`; // https://bozuman.cybozu.com/g/
-    private PATH = '/api/v1/';
+export default class GaroonServiceImpl implements GaroonService {
+    private BASE_URL = 'https://bozuman.s.cybozu.com/g/'; //FIXME: セキュアアクセス以外のときも動くようにする
+    private PATH = 'api/v1/';
     private soap = new GaroonSoap(this.BASE_URL);
 
-    getScheduleEvents(params: any): Promise<any> {
-        const url = new URL(`${this.BASE_URL}${this.PATH}/schedule/events`);
+    getScheduleEvents(rangeStart: string, rangeEnd: string, targetType = '', target = ''): Promise<any> {
+        const url = new URL(`${this.BASE_URL}${this.PATH}schedule/events`);
         url.searchParams.append('orderBy', 'start asc');
-        url.searchParams.append('rangeStart', params.startDate.toISOString());
-        url.searchParams.append('rangeEnd', params.endDate.toISOString());
-        url.searchParams.append('targetType', params.targetType);
-        url.searchParams.append('target', params.target);
-        return fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+
+        if (rangeStart !== null) {
+            url.searchParams.append('rangeStart', rangeStart);
+        }
+
+        if (rangeEnd !== null) {
+            url.searchParams.append('rangeEnd', rangeEnd);
+        }
+
+        if (targetType !== null && targetType !== '') {
+            url.searchParams.append('targetType', targetType);
+        }
+
+        if (target !== null && target !== '') {
+            url.searchParams.append('target', target);
+        }
+
+        return fetch(url.toString(), {
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        });
     }
 
     getMyGroupVersions(): Promise<any> {

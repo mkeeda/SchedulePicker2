@@ -1,9 +1,10 @@
 import GaroonSoap from 'garoon-soap';
+import { ItemVersionType, ItemVersionResultType, MyGroupType } from 'garoon-soap/dist/type/base';
 
 interface GaroonService {
     getScheduleEvents(rangeStart: string, rangeEnd: string, targetType: string, target: string): Promise<any>;
-    getMyGroupVersions(): Promise<any>;
-    getMyGroupsByIds(id: string[]): Promise<any>;
+    getMyGroupVersions(myGroupItems: ItemVersionType[]): Promise<ItemVersionResultType[]>;
+    getMyGroupsById(id: string[]): Promise<MyGroupType[]>;
 }
 
 export default class GaroonServiceImpl implements GaroonService {
@@ -37,11 +38,11 @@ export default class GaroonServiceImpl implements GaroonService {
         });
     }
 
-    getMyGroupVersions(): Promise<any> {
-        return this.soap.base.getMyGroupVersions([]);
+    getMyGroupVersions(myGroupItems: ItemVersionType[]): Promise<ItemVersionResultType[]> {
+        return this.soap.base.getMyGroupVersions(myGroupItems);
     }
 
-    getMyGroupsByIds(groupIds: string[]): Promise<any> {
+    getMyGroupsById(groupIds: string[]): Promise<MyGroupType[]> {
         return this.soap.base.getMyGroupsById(groupIds);
     }
 }

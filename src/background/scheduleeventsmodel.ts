@@ -1,19 +1,29 @@
 import GaroonService from './garoonservice';
-
-enum ScheduleEventType {
-    TODAY,
-    NEXT_BUSINESS_DAY,
-    SECRET,
-}
+import { ScheduleEventType } from './eventtype';
+import { MyGroupType } from 'garoon-soap/dist/type/base';
 
 export default class ScheduleEventsModel {
     private garoonService = new GaroonService();
 
-    getMySchedule(): Promise<any> {
+    private findDateFromType(type: ScheduleEventType): any {
         // TODO: typeによる条件分岐を追加する
         const now = new Date();
         const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-        return this.garoonService.getScheduleEvents(startDate.toISOString(), endDate.toISOString());
+        return { start: startDate, end: endDate };
+    }
+
+    // TODO: 引数でScheduleTypeを受け取る
+    async getMySchedule(): Promise<any> {
+        const date = this.findDateFromType(ScheduleEventType.TODAY);
+        const respStream = await this.garoonService.getScheduleEvents(date.start.toISOString(), date.end.toISOString());
+        const respJson = await respStream.json();
+        return respJson;
+    }
+
+    async getMyGroups(): Promise<MyGroupType[]> {
+        const myGroupVersions = await this.garoonService.getMyGroupVersions([]);
+        const myGroupIds = myGroupVersions.map(group => group.id);
+        return this.garoonService.getMyGroupsById(myGroupIds);
     }
 }

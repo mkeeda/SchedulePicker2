@@ -1,10 +1,45 @@
+import { ScheduleEventType, ContextMenuIds } from './eventtype';
 import ScheduleEventsModel from './scheduleeventsmodel';
 
-const testPromise = async (): Promise<void> => {
+const createContextMenuItems = async (): Promise<any> => {
+    const defaultMenuItems = [
+        { id: ContextMenuIds.ROOT.toString(), title: 'SchedulePicker' },
+        { id: ContextMenuIds.TODAY.toString(), title: '今日の予定', parentId: ContextMenuIds.ROOT },
+        { id: ContextMenuIds.NEXT_BUSINESS_DAY.toString(), title: '翌営業日の予定', parentId: ContextMenuIds.ROOT },
+        { id: ContextMenuIds.TEMPLATE.toString(), title: 'テンプレート', parentId: ContextMenuIds.ROOT },
+        { id: ContextMenuIds.MYSELF.toString(), title: '自分', parentId: ContextMenuIds.TODAY },
+    ];
+
     const model = new ScheduleEventsModel();
-    const resp = await model.getMySchedule();
-    console.log(resp);
+    const myGroups = await model.getMyGroups();
+    const myGroupMenuItems = myGroups.map(g => {
+        return { id: g.key, title: g.name, parentId: ContextMenuIds.TODAY };
+    });
+    return defaultMenuItems.concat(myGroupMenuItems);
 };
 
-console.log('echo backgroundddd');
-testPromise();
+const addMenu = (menu: any): void => {
+    chrome.contextMenus.create({
+        id: menu.id,
+        title: menu.title,
+        parentId: menu.parentId,
+        type: 'normal',
+        contexts: ['all'],
+    });
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+const onClickContextMenuItem = (info: any, tab: any) => {
+    console.log(info);
+    console.log(tab);
+};
+
+const setupContextMenu = async (): Promise<void> => {
+    const contextMenuItems = await createContextMenuItems();
+    contextMenuItems.forEach(item => {
+        addMenu(item);
+    });
+    chrome.contextMenus.onClicked.addListener(onClickContextMenuItem);
+};
+
+setupContextMenu();

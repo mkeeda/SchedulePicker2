@@ -1,6 +1,6 @@
 import GaroonService from './garoonservice';
 import { ScheduleEventType } from './eventtype';
-import { MyGroupType } from 'garoon-soap/dist/type/base';
+import * as base from 'garoon-soap/dist/type/base';
 
 export default class ScheduleEventsModel {
     private garoonService = new GaroonService();
@@ -21,7 +21,7 @@ export default class ScheduleEventsModel {
         return respJson;
     }
 
-    async getMyGroups(): Promise<MyGroupType[]> {
+    async getMyGroups(): Promise<base.MyGroupType[]> {
         const myGroupVersions = await this.garoonService.getMyGroupVersions([]);
         const myGroupIds = myGroupVersions.map(group => group.id);
         return this.garoonService.getMyGroupsById(myGroupIds);

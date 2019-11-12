@@ -28,18 +28,15 @@ const addMenu = (menu: any): void => {
     });
 };
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-const onClickContextMenuItem = (info: any, tab: any) => {
-    console.log(info);
-    console.log(tab);
-};
-
 const setupContextMenu = async (): Promise<void> => {
     const contextMenuItems = await createContextMenuItems();
     contextMenuItems.forEach(item => {
         addMenu(item);
     });
-    chrome.contextMenus.onClicked.addListener(onClickContextMenuItem);
+    chrome.contextMenus.onClicked.addListener((info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) => {
+        console.log(info);
+        console.log(tab);
+    });
 };
 
 setupContextMenu();

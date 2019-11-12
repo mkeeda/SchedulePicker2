@@ -44,15 +44,42 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
             throw new Error('選択したMyグループが存在しません');
         }
 
-        const eventsPerUser = await Promise.all(
+        /*
+        [
+            [{}, {}, {}],
+            [{}, {}, {}],
+            [{}, {}, {}]
+            ....
+        ]
+        */
+        const eventsPerUserList = await Promise.all(
             targetMyGroups[0].belong_member.map(async userId => {
                 const schedule = await this.getMySchedule(type, 'user', userId);
-                return schedule;
+                return schedule.events;
             })
         );
 
+        /*
+            [{}, {}, {},........]
+        */
+        let mergeEventsList = [];
+        eventsPerUserList.forEach(events => {
+            mergeEventsList = mergeEventsList.concat(events);
+        });
+
+        const events = mergeEventsList.reduce((uniqueEvents: any, currentEvent: any) => {
+            if (!uniqueEvents.some(event => event.id === currentEvent.id)) {
+                uniqueEvents.push(currentEvent);
+            }
+            return uniqueEvents;
+        }, []);
+
         console.log('bk');
-        console.log(eventsPerUser);
-        return eventsPerUser;
+        console.log(events);
+
+        /*
+            {events: [{}, {}, {}....]}
+        */
+        return events;
     }
 }

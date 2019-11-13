@@ -7,6 +7,7 @@ import EventConverter from '../background/eventconverter';
 import * as util from './util';
 
 interface ScheduleEventsLogic {
+    getMyEvents(type: ScheduleEventType, targetType: string, target: string): Promise<any>;
     getSortedMyEvents(type: ScheduleEventType, targetType: string, target: string): Promise<any>;
     getMyGroups(): Promise<base.MyGroupType[]>;
     getMyGroupSchedule(type: ScheduleEventType, groupId: string): Promise<any>;
@@ -27,7 +28,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         return { start: startDate, end: endDate };
     }
 
-    async getSortedMyEvents(type: ScheduleEventType, targetType = '', target = ''): Promise<any> {
+    async getMyEvents(type: ScheduleEventType, targetType = '', target = ''): Promise<any> {
         const date = this.findDateFromType(type);
         const respStream = await this.garoonService.getScheduleEvents(
             date.start.toISOString(),
@@ -36,10 +37,14 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
             target
         );
         const respJson = await respStream.json();
-        const eventInfoList = respJson.events.map(event => {
+        return respJson.events.map(event => {
             return EventConverter.convertToEventInfo(event);
         });
-        return util.sortByTime(eventInfoList);
+    }
+
+    async getSortedMyEvents(type: ScheduleEventType, targetType = '', target = ''): Promise<any> {
+        const eventInfoList = await this.getMyEvents(type);
+        return eventInfoList.sort(util.sortByTimeFunc);
     }
 
     // TODO: 型定義ファイルを作る
@@ -68,7 +73,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         */
         const eventInfoPerUserList = await Promise.all(
             groupMemberList.map(async userId => {
-                const eventInfoList = await this.getSortedMyEvents(type, 'user', userId);
+                const eventInfoList = await this.getMyEvents(type, 'user', userId);
                 return eventInfoList;
             })
         );

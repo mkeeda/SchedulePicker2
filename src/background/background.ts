@@ -38,8 +38,8 @@ const setupContextMenu = async (domain: string): Promise<void> => {
     chrome.contextMenus.onClicked.addListener(async (info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) => {
         switch (info.menuItemId) {
             case ContextMenuIds.MYSELF: {
-                const schedule = await logic.getMySchedule(ScheduleEventType.TODAY);
-                chrome.tabs.sendMessage(tab!.id!, util.sortByTime(schedule.events));
+                const eventInfoList = await logic.getMySchedule(ScheduleEventType.TODAY);
+                chrome.tabs.sendMessage(tab!.id!, util.sortByTime(eventInfoList));
                 break;
             }
             case ContextMenuIds.NEXT_BUSINESS_DAY: {

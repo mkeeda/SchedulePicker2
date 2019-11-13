@@ -34,7 +34,10 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
             targetType,
             target
         );
-        return respStream.json();
+        const respJson = await respStream.json();
+        return respJson.events.map(event => {
+            return EventConverter.convertToEventInfo(event);
+        });
     }
 
     async getMyGroups(): Promise<base.MyGroupType[]> {
@@ -95,8 +98,8 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
             });
 
         /*
-            {events: [{}, {}, {}....]}
+            [{}, {}, {}....]
         */
-        return { events: myGroupEvents };
+        return myGroupEvents;
     }
 }

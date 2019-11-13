@@ -3,9 +3,9 @@ import { ScheduleEventType } from './eventtype';
 import * as base from 'garoon-soap/dist/type/base';
 
 interface ScheduleEventsLogic {
-    getMySchedule(ScheduleEventType): Promise<any>;
+    getMySchedule(type: ScheduleEventType, targetType: string, target: string): Promise<any>;
     getMyGroups(): Promise<base.MyGroupType[]>;
-    getMyGroupSchedule(member, string): Promise<any>;
+    getMyGroupSchedule(type: ScheduleEventType, groupId: string): Promise<any>;
 }
 
 export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {

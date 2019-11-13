@@ -59,5 +59,8 @@ const setupContextMenu = async (domain: string): Promise<void> => {
 };
 
 chrome.runtime.onMessage.addListener((message, sender, resp) => {
-    setupContextMenu(message.domain);
+    // FIXME 全部消すんじゃなくて、MyGroupのメニューだけを消すようにする
+    chrome.contextMenus.removeAll(() => {
+        setupContextMenu(message.domain);
+    });
 });

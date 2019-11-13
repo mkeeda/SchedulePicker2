@@ -13,8 +13,8 @@ export default class EventConverter {
         return {
             id: event.id,
             subject: event.subject,
-            startTime: util.formatDate(new Date(event.start.dateTime)),
-            endTime: util.formatDate(new Date(event.end.dateTime)),
+            startTime: event.start.dateTime,
+            endTime: event.end.dateTime,
             eventType: event.eventType,
             eventMenu: event.eventMenu,
             attendees: event.attendees.map(attendee => {

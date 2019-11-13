@@ -7,17 +7,14 @@ export const formatDate = (date: Date): string => {
     return time; // HH:mm
 };
 
-export const sortByTime = (eventInfoList: EventInfo[]): any => {
-    eventInfoList.sort((eventInfo, nextEventInfo) => {
-        if (eventInfo.startTime > nextEventInfo.endTime) {
-            return 1; // nextEvent, event の順番に並べ替える
-        }
+export const sortByTimeFunc = (eventInfo, nextEventInfo): number => {
+    if (new Date(eventInfo.startTime) > new Date(nextEventInfo.startTime)) {
+        return 1; // nextEvent, event の順番に並べ替える
+    }
 
-        if (eventInfo.startTime < nextEventInfo.endTime) {
-            return -1; // event, nextEvent の順番に並べ替える
-        }
+    if (new Date(eventInfo.startTime) < new Date(nextEventInfo.startTime)) {
+        return -1; // event, nextEvent の順番に並べ替える
+    }
 
-        return 0;
-    });
-    return eventInfoList;
+    return 0;
 };

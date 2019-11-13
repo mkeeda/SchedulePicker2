@@ -93,6 +93,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
                 }
                 return uniqueEvents;
             }, [])
+            .sort(util.sortByTimeFunc)
             .map(eventInfo => {
                 const participantList: Participant[] = [];
                 eventInfo.attendees.forEach((participant: Participant) => {

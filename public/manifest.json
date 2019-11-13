@@ -10,7 +10,7 @@
     },
     "permissions": [
         "storage",
-        "tabs",
+        "activeTab",
         "background",
         "contextMenus",
         "https://bozuman.cybozu.com/*",

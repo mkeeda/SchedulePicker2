@@ -2,6 +2,8 @@ import GaroonService from './garoonservice';
 import { ScheduleEventType } from './eventtype';
 import * as base from 'garoon-soap/dist/type/base';
 import GaroonServiceImpl from './garoonservice';
+import { Participant } from '../model/event';
+import EventConverter from '../background/eventconverter';
 
 interface ScheduleEventsLogic {
     getMySchedule(type: ScheduleEventType, targetType: string, target: string): Promise<any>;
@@ -73,7 +75,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
             mergeEventsList = mergeEventsList.concat(events);
         });
 
-        const events = mergeEventsList
+        const myGroupEvents = mergeEventsList
             .reduce((uniqueEvents: any, currentEvent: any) => {
                 if (!uniqueEvents.some(event => event.id === currentEvent.id)) {
                     uniqueEvents.push(currentEvent);
@@ -81,23 +83,20 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
                 return uniqueEvents;
             }, [])
             .map(event => {
-                const participantNameList: string[] = [];
+                const participantList: Participant[] = [];
                 event.attendees.forEach((participant: any) => {
                     groupMemberList.forEach(userId => {
                         if (participant.id === userId) {
-                            participantNameList.push(participant.name.split(' ')[0]);
+                            participantList.push({ id: participant.id, name: participant.name });
                         }
                     });
                 });
-
-                //TODO: スケジュールのタイトルに名前を入れない
-                event.subject += ` (${participantNameList.join('、')})`;
-                return event;
+                return EventConverter.convertToMyGroupEvent(event, participantList);
             });
 
         /*
             {events: [{}, {}, {}....]}
         */
-        return { events: events };
+        return { events: myGroupEvents };
     }
 }

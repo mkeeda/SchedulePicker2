@@ -1,5 +1,4 @@
 import { ScheduleEventType, ContextMenuIds } from './eventtype';
-import ScheduleEventLogic from './scheduleeventslogic';
 import * as util from './util';
 import ScheduleEventsLogicImpl from './scheduleeventslogic';
 

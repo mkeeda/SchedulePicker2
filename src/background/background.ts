@@ -2,14 +2,15 @@ import { ScheduleEventType, ContextMenuIds } from './eventtype';
 import * as util from './util';
 import ScheduleEventsLogicImpl from './scheduleeventslogic';
 
+const defaultMenuItems = [
+    { id: ContextMenuIds.ROOT.toString(), title: 'SchedulePicker' },
+    { id: ContextMenuIds.TODAY.toString(), title: '今日の予定', parentId: ContextMenuIds.ROOT },
+    { id: ContextMenuIds.NEXT_BUSINESS_DAY.toString(), title: '翌営業日の予定', parentId: ContextMenuIds.ROOT },
+    { id: ContextMenuIds.TEMPLATE.toString(), title: 'テンプレート', parentId: ContextMenuIds.ROOT },
+    { id: ContextMenuIds.MYSELF.toString(), title: '自分', parentId: ContextMenuIds.TODAY },
+];
+
 const createContextMenuItems = async (myGroupMenuItems): Promise<any> => {
-    const defaultMenuItems = [
-        { id: ContextMenuIds.ROOT.toString(), title: 'SchedulePicker' },
-        { id: ContextMenuIds.TODAY.toString(), title: '今日の予定', parentId: ContextMenuIds.ROOT },
-        { id: ContextMenuIds.NEXT_BUSINESS_DAY.toString(), title: '翌営業日の予定', parentId: ContextMenuIds.ROOT },
-        { id: ContextMenuIds.TEMPLATE.toString(), title: 'テンプレート', parentId: ContextMenuIds.ROOT },
-        { id: ContextMenuIds.MYSELF.toString(), title: '自分', parentId: ContextMenuIds.TODAY },
-    ];
     return defaultMenuItems.concat(myGroupMenuItems);
 };
 

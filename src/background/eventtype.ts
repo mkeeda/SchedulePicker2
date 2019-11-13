@@ -12,6 +12,12 @@ export enum ContextMenuIds {
     MYSELF = 'myself',
 }
 
+export enum EventsType {
+    MY_EVENTS,
+    MY_GROUP_EVENT,
+    ERROR,
+}
+
 export enum StorageKeys {
     IS_INCLUDE = 'isInclude',
     DATE = 'date',

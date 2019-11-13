@@ -1,3 +1,5 @@
+import { EventsType } from '../background/eventtype';
+
 export interface EventInfo {
     id: string;
     subject: string;
@@ -19,4 +21,9 @@ export interface Participant {
 export interface MyGroupEvent {
     eventInfo: EventInfo;
     participants: Participant[];
+}
+
+export interface RecieveEventMessage {
+    eventType: EventsType;
+    events: any;
 }

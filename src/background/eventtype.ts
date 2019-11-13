@@ -14,7 +14,7 @@ export enum ContextMenuIds {
 
 export enum EventsType {
     MY_EVENTS,
-    MY_GROUP_EVENT,
+    MY_GROUP_EVENTS,
     ERROR,
 }
 

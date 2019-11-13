@@ -57,7 +57,7 @@ const setupContextMenu = async (domain: string): Promise<void> => {
                             info.menuItemId
                         );
                         chrome.tabs.sendMessage(tab!.id!, {
-                            eventType: EventsType.MY_GROUP_EVENT,
+                            eventType: EventsType.MY_GROUP_EVENTS,
                             events: myGroupEventList,
                         });
                         break;

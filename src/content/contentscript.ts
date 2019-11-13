@@ -1,23 +1,34 @@
 import { StorageKeys, EventsType } from '../background/eventtype';
-import { EventInfo, Participant, RecieveEventMessage } from '../model/event';
+import { EventInfo, Participant, RecieveEventMessage, MyGroupEvent } from '../model/event';
 
-// FIXME: 変数名とか内部の処理とかmakehtml.jsを見ながら修正必要
-const createMyScheduleHtml = (eventInfoList: EventInfo[]): string => {
+const createHtmlForEvent = (eventInfo: EventInfo, participants: Participant[] = []): string => {
+    return `
+    <div>
+        <span>${eventInfo.startTime}-${eventInfo.startTime}</span>
+        <a href="https://bozuman.cybozu.com/g/schedule/view.csp?event=${eventInfo.id}">${eventInfo.subject}</a>
+        ${participants
+            .map(
+                participant =>
+                    `<a href="https://bozuman.cybozu.com/g/schedule/personal_day.csp?uid=${participant.id}">${participant.name}</a>`
+            )
+            .join('')}
+    </div>
+    `;
+};
+
+const createHtmlForEventList = (eventInfoList: EventInfo[]): string => {
     const title = `<div>【date】の予定</div>`;
-    const body = eventInfoList
-        .map(eventInfo => {
-            return `
-            <div>
-                <span>${eventInfo.startTime}-${eventInfo.startTime}</span>
-                <a href="https://bozuman.cybozu.com/g/schedule/view.csp?event=${eventInfo.id}">${eventInfo.subject}</a>
-            </div>
-            `;
-        })
-        .join('');
+    const body = eventInfoList.map(eventInfo => createHtmlForEvent(eventInfo)).join('');
     return `${title}${body}`;
 };
 
-// const createEventHtml = (eventInfoList: EventInfo[], participant: Participant[] = []) => {};
+const createHtmlForMyGroupEventList = (myGroupEventList: MyGroupEvent[]): string => {
+    const title = `<div>【date】の予定</div>`;
+    const body = myGroupEventList
+        .map(myGroupEvent => createHtmlForEvent(myGroupEvent.eventInfo, myGroupEvent.participants))
+        .join('');
+    return `${title}${body}`;
+};
 
 chrome.runtime.sendMessage({ domain: document.domain });
 
@@ -30,12 +41,12 @@ chrome.runtime.onMessage.addListener((message: RecieveEventMessage) => {
     }
 
     if (message.eventType === EventsType.MY_EVENTS) {
-        console.log('my sche');
+        const html = createHtmlForEventList(message.events);
+        document.execCommand('insertHtml', false, html);
     }
 
-    if (message.eventType === EventsType.MY_GROUP_EVENT) {
-        console.log('group');
+    if (message.eventType === EventsType.MY_GROUP_EVENTS) {
+        const html = createHtmlForMyGroupEventList(message.events);
+        document.execCommand('insertHtml', false, html);
     }
-
-    // document.execCommand('insertHtml', false, createMyScheduleHtml(eventInfoList));
 });

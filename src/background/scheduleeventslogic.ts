@@ -4,9 +4,10 @@ import * as base from 'garoon-soap/dist/type/base';
 import GaroonServiceImpl from './garoonservice';
 import { Participant } from '../model/event';
 import EventConverter from '../background/eventconverter';
+import * as util from './util';
 
 interface ScheduleEventsLogic {
-    getMySchedule(type: ScheduleEventType, targetType: string, target: string): Promise<any>;
+    getSortedMyEvents(type: ScheduleEventType, targetType: string, target: string): Promise<any>;
     getMyGroups(): Promise<base.MyGroupType[]>;
     getMyGroupSchedule(type: ScheduleEventType, groupId: string): Promise<any>;
 }
@@ -26,7 +27,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         return { start: startDate, end: endDate };
     }
 
-    async getMySchedule(type: ScheduleEventType, targetType = '', target = ''): Promise<any> {
+    async getSortedMyEvents(type: ScheduleEventType, targetType = '', target = ''): Promise<any> {
         const date = this.findDateFromType(type);
         const respStream = await this.garoonService.getScheduleEvents(
             date.start.toISOString(),
@@ -35,11 +36,13 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
             target
         );
         const respJson = await respStream.json();
-        return respJson.events.map(event => {
+        const eventInfoList = respJson.events.map(event => {
             return EventConverter.convertToEventInfo(event);
         });
+        return util.sortByTime(eventInfoList);
     }
 
+    // TODO: 型定義ファイルを作る
     async getMyGroups(): Promise<base.MyGroupType[]> {
         const myGroupVersions = await this.garoonService.getMyGroupVersions([]);
         const myGroupIds = myGroupVersions.map(group => group.id);
@@ -63,43 +66,43 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
             ....
         ]
         */
-        const eventsPerUserList = await Promise.all(
+        const eventInfoPerUserList = await Promise.all(
             groupMemberList.map(async userId => {
-                const schedule = await this.getMySchedule(type, 'user', userId);
-                return schedule.events;
+                const eventInfoList = await this.getSortedMyEvents(type, 'user', userId);
+                return eventInfoList;
             })
         );
 
         /*
             [{}, {}, {},........]
         */
-        let mergeEventsList = [];
-        eventsPerUserList.forEach(events => {
-            mergeEventsList = mergeEventsList.concat(events);
+        let mergeEventInfoList = [];
+        eventInfoPerUserList.forEach(events => {
+            mergeEventInfoList = mergeEventInfoList.concat(events);
         });
 
-        const myGroupEvents = mergeEventsList
+        const myGroupEventList = mergeEventInfoList
             .reduce((uniqueEvents: any, currentEvent: any) => {
                 if (!uniqueEvents.some(event => event.id === currentEvent.id)) {
                     uniqueEvents.push(currentEvent);
                 }
                 return uniqueEvents;
             }, [])
-            .map(event => {
+            .map(eventInfo => {
                 const participantList: Participant[] = [];
-                event.attendees.forEach((participant: any) => {
+                eventInfo.attendees.forEach((participant: Participant) => {
                     groupMemberList.forEach(userId => {
                         if (participant.id === userId) {
-                            participantList.push({ id: participant.id, name: participant.name });
+                            participantList.push(participant);
                         }
                     });
                 });
-                return EventConverter.convertToMyGroupEvent(event, participantList);
+                return EventConverter.convertToMyGroupEvent(eventInfo, participantList);
             });
 
         /*
             [{}, {}, {}....]
         */
-        return myGroupEvents;
+        return myGroupEventList;
     }
 }

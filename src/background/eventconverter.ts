@@ -1,10 +1,10 @@
 import * as util from './util';
-import { EventInfo, MyGroupEvent } from '../model/event';
+import { EventInfo, MyGroupEvent, Participant } from '../model/event';
 
 export default class EventConverter {
-    static convertToMyGroupEvent(event, participants): MyGroupEvent {
+    static convertToMyGroupEvent(eventInfo: EventInfo, participants: Participant[]): MyGroupEvent {
         return {
-            event: this.convertToEventInfo(event),
+            eventInfo: eventInfo,
             participants: participants,
         };
     }
@@ -17,6 +17,9 @@ export default class EventConverter {
             endTime: util.formatDate(new Date(event.end.dateTime)),
             eventType: event.eventType,
             eventMenu: event.eventMenu,
+            attendees: event.attendees.map(attendee => {
+                return { id: attendee.id, name: attendee.name };
+            }),
             visibilityType: event.visibilityType,
             isAllDay: event.isAllDay,
             isStartOnly: event.isStartDay,

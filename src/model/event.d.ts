@@ -6,6 +6,7 @@ export interface EventInfo {
     eventType: string;
     eventMenu: string;
     visibilityType: string;
+    attendees: Participant[];
     isAllDay: boolean;
     isStartOnly: boolean;
 }
@@ -16,6 +17,6 @@ export interface Participant {
 }
 
 export interface MyGroupEvent {
-    event: EventInfo;
+    eventInfo: EventInfo;
     participants: Participant[];
 }

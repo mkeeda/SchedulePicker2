@@ -17,6 +17,8 @@ const createHtml = (events: any): string => {
     return `${title}${body}`;
 };
 
+chrome.runtime.sendMessage({ domain: document.domain });
+
 chrome.runtime.onMessage.addListener((events: any) => {
     chrome.storage.sync.get([StorageKeys.IS_INCLUDE, StorageKeys.DATE, StorageKeys.TEMPLATE_TEXT], item => {
         // 現在フォーカスが与えられている要素を取得する

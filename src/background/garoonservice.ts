@@ -8,12 +8,17 @@ interface GaroonService {
 }
 
 export default class GaroonServiceImpl implements GaroonService {
-    private BASE_URL = 'https://bozuman.s.cybozu.com/g/'; //FIXME: セキュアアクセス以外のときも動くようにする
+    private baseUrl: string;
     private PATH = 'api/v1/';
-    private soap = new GaroonSoap(this.BASE_URL);
+    private soap: GaroonSoap;
+
+    constructor(domain: string) {
+        this.baseUrl = `https://${domain}/g/`;
+        this.soap = new GaroonSoap(this.baseUrl);
+    }
 
     getScheduleEvents(rangeStart: string, rangeEnd: string, targetType = '', target = ''): Promise<any> {
-        const url = new URL(`${this.BASE_URL}${this.PATH}schedule/events`);
+        const url = new URL(`${this.baseUrl}${this.PATH}schedule/events`);
         url.searchParams.append('orderBy', 'start asc');
 
         if (rangeStart !== null) {

@@ -1,10 +1,9 @@
 import { ScheduleEventType, ContextMenuIds } from './eventtype';
 import ScheduleEventLogic from './scheduleeventslogic';
 import * as util from './util';
+import ScheduleEventsLogicImpl from './scheduleeventslogic';
 
-const logic = new ScheduleEventLogic();
-
-const createContextMenuItems = async (): Promise<any> => {
+const createContextMenuItems = async (myGroupMenuItems): Promise<any> => {
     const defaultMenuItems = [
         { id: ContextMenuIds.ROOT.toString(), title: 'SchedulePicker' },
         { id: ContextMenuIds.TODAY.toString(), title: '今日の予定', parentId: ContextMenuIds.ROOT },
@@ -12,11 +11,6 @@ const createContextMenuItems = async (): Promise<any> => {
         { id: ContextMenuIds.TEMPLATE.toString(), title: 'テンプレート', parentId: ContextMenuIds.ROOT },
         { id: ContextMenuIds.MYSELF.toString(), title: '自分', parentId: ContextMenuIds.TODAY },
     ];
-
-    const myGroups = await logic.getMyGroups();
-    const myGroupMenuItems = myGroups.map(g => {
-        return { id: g.key, title: g.name, parentId: ContextMenuIds.TODAY };
-    });
     return defaultMenuItems.concat(myGroupMenuItems);
 };
 
@@ -30,8 +24,14 @@ const addMenu = (menu: any): void => {
     });
 };
 
-const setupContextMenu = async (): Promise<void> => {
-    const contextMenuItems = await createContextMenuItems();
+const setupContextMenu = async (domain: string): Promise<void> => {
+    const logic = new ScheduleEventsLogicImpl(domain);
+    const myGroups = await logic.getMyGroups();
+    const myGroupMenuItems = myGroups.map(g => {
+        return { id: g.key, title: g.name, parentId: ContextMenuIds.TODAY };
+    });
+
+    const contextMenuItems = await createContextMenuItems(myGroupMenuItems);
     contextMenuItems.forEach(item => {
         addMenu(item);
     });
@@ -59,4 +59,6 @@ const setupContextMenu = async (): Promise<void> => {
     });
 };
 
-setupContextMenu();
+chrome.runtime.onMessage.addListener((message, sender, resp) => {
+    setupContextMenu(message.domain);
+});

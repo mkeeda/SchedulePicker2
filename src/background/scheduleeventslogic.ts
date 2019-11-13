@@ -1,6 +1,7 @@
 import GaroonService from './garoonservice';
 import { ScheduleEventType } from './eventtype';
 import * as base from 'garoon-soap/dist/type/base';
+import GaroonServiceImpl from './garoonservice';
 
 interface ScheduleEventsLogic {
     getMySchedule(type: ScheduleEventType, targetType: string, target: string): Promise<any>;
@@ -9,7 +10,11 @@ interface ScheduleEventsLogic {
 }
 
 export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
-    private garoonService = new GaroonService();
+    private garoonService: GaroonService;
+
+    constructor(domain: string) {
+        this.garoonService = new GaroonServiceImpl(domain);
+    }
 
     private findDateFromType(type: ScheduleEventType): any {
         // TODO: typeによる条件分岐を追加する

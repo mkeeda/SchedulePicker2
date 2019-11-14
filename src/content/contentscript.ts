@@ -1,16 +1,27 @@
 import { EventsType } from '../background/eventtype';
 import { EventInfo, Participant, RecieveEventMessage, MyGroupEvent } from '../model/event';
 import { formatDate } from '../background/dateutil';
+import { eventMenuColor } from './eventmenucolor';
 
-const isAlldayInRegularEvent = (eventInfo: EventInfo) => {
+const isAlldayInRegularEvent = (eventInfo: EventInfo): boolean => {
     const startTime = formatDate(new Date(eventInfo.startTime), 'HH:mm');
     const endTime = formatDate(new Date(eventInfo.endTime), 'HH:mm');
     return startTime === '00:00' && endTime === '23:59';
 };
 
+const createEventMenu = (planName: string): string => {
+    const rgb = eventMenuColor(planName);
+    return `<span style="background-color: rgb(${rgb.r}, ${rgb.g}, ${rgb.b}); display: inline-block; margin-right: 3px; padding: 2px 2px 1px; color: rgb(255, 255, 255); font-size: 11.628px; border-radius: 2px; line-height: 1.1;">${planName}</span>`;
+};
+
 const createHtmlForItem = (eventInfo: EventInfo, date: Date, participants: Participant[] = []): string => {
     const formattedDate = formatDate(date, 'yyyy-MM-dd');
-    return `
+    let body = '';
+    if (eventInfo.eventMenu !== '') {
+        body += createEventMenu(eventInfo.eventMenu);
+    }
+
+    body += `
         <a href="https://bozuman.cybozu.com/g/schedule/view.csp?event=${eventInfo.id}">${eventInfo.subject}</a>
         ${participants
             .map(
@@ -22,6 +33,7 @@ const createHtmlForItem = (eventInfo: EventInfo, date: Date, participants: Parti
             )
             .join('')}
     `;
+    return body;
 };
 
 const createHtmlForItemWithTimeRange = (eventInfo: EventInfo, date: Date, participants: Participant[] = []): string => {
@@ -51,15 +63,16 @@ const createHtmlForEventList = (eventInfoList: EventInfo[], date: Date): string 
     });
 
     let body = `${title}`;
-    body += regularEventList.map(eventInfo => {
-        if (isAlldayInRegularEvent(eventInfo)) {
-            return `<div>${createHtmlForItem(eventInfo, date)}</div>`;
-        } else {
-            return createHtmlForItemWithTimeRange(eventInfo, date);
+    body += regularEventList
+        .map(eventInfo => {
+            if (isAlldayInRegularEvent(eventInfo)) {
+                return `<div>${createHtmlForItem(eventInfo, date)}</div>`;
+            } else {
+                return createHtmlForItemWithTimeRange(eventInfo, date);
+            }
+        })
+        .join('');
 
-        }
-    }).join('');
-    
     if (allDayEventList.length !== 0) {
         body += '<br><div>［終日予定］</div>';
         body += allDayEventList.map(eventInfo => `<div>${createHtmlForItem(eventInfo, date)}</div>`).join('');
@@ -90,7 +103,8 @@ const createHtmlForMyGroupEventList = (myGroupEventList: MyGroupEvent[], date: D
             } else {
                 return createHtmlForItemWithTimeRange(groupEvent.eventInfo, date, groupEvent.participants);
             }
-        }).join('');
+        })
+        .join('');
 
     if (allDayEventList.length !== 0) {
         body += '<br><div>［終日予定］</div>';

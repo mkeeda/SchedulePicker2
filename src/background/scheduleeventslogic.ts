@@ -4,7 +4,7 @@ import GaroonDataSourceImpl from './garoondatasource';
 import { EventInfo, Participant, MyGroupEvent } from '../types/event';
 import EventConverter from '../background/eventconverter';
 import * as util from './util';
-import { DateRange } from '../types/date';
+import { DateRange, PublicHoliday } from '../types/date';
 
 interface ScheduleEventsLogic {
     getMyEvents(dateRange: DateRange, isPrivate: boolean, targetType: string, target: string): Promise<EventInfo[]>;
@@ -16,6 +16,7 @@ interface ScheduleEventsLogic {
     ): Promise<EventInfo[]>;
     getMyGroups(): Promise<base.MyGroupType[]>;
     getMyGroupSchedule(dateRange: DateRange, isPrivate: boolean, groupId: string): Promise<any>;
+    getNarrowedDownPublicHolidays(specificYear: number): Promise<PublicHoliday[]>;
 }
 
 export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
@@ -112,5 +113,21 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
             [{}, {}, {}....]
         */
         return myGroupEventList;
+    }
+
+    async getNarrowedDownPublicHolidays(specificYear: number): Promise<PublicHoliday[]> {
+        const calendarEvents = await this.garoonDataSource.getCalendarEvents();
+        return calendarEvents
+            .filter(event => {
+                const year = event.date.toString().split('-')[0];
+                // リストのサイズが大きすぎるので、指定した年の１年前後の祝日のリストに絞り込む
+                return (
+                    event.type === 'public_holiday' &&
+                    (String(specificYear - 1) === year ||
+                        String(specificYear) === year ||
+                        String(specificYear + 1) === year)
+                );
+            })
+            .map(event => EventConverter.convertToPublicHoliday(event));
     }
 }

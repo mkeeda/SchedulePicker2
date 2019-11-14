@@ -56,4 +56,8 @@ export default class GaroonDataSourceImpl implements GaroonDataSource {
     getMyGroupsById(groupIds: string[]): Promise<base.MyGroupType[]> {
         return this.soap.base.getMyGroupsById(groupIds);
     }
+
+    getCalendarEvents(): Promise<base.BaseGetCalendarEventType[]> {
+        return this.soap.base.getCalendarEvents();
+    }
 }

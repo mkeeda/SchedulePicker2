@@ -195,4 +195,8 @@ chrome.runtime.onMessage.addListener((message, sender) => {
     }
 });
 
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.storage.sync.set({ dateType: DateType.TODAY });
+});
+
 setupContextMenus();

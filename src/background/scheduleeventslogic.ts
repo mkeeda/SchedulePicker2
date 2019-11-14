@@ -4,7 +4,7 @@ import GaroonDataSourceImpl from './garoondatasource';
 import { EventInfo, Participant, MyGroupEvent } from '../types/event';
 import EventConverter from '../background/eventconverter';
 import * as util from './util';
-import { DateRange, PublicHoliday } from '../types/date';
+import { DateRange } from '../types/date';
 
 interface ScheduleEventsLogic {
     getMyEvents(dateRange: DateRange, isPrivate: boolean, targetType: string, target: string): Promise<EventInfo[]>;
@@ -16,7 +16,7 @@ interface ScheduleEventsLogic {
     ): Promise<EventInfo[]>;
     getMyGroups(): Promise<base.MyGroupType[]>;
     getMyGroupEvents(dateRange: DateRange, isPrivate: boolean, groupId: string): Promise<MyGroupEvent[]>;
-    getNarrowedDownPublicHolidays(specificYear: number): Promise<PublicHoliday[]>;
+    getNarrowedDownPublicHolidays(specificYear: number): Promise<Date[]>;
 }
 
 export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
@@ -115,7 +115,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         return myGroupEventList;
     }
 
-    async getNarrowedDownPublicHolidays(specificYear: number): Promise<PublicHoliday[]> {
+    async getNarrowedDownPublicHolidays(specificYear: number): Promise<Date[]> {
         const calendarEvents = await this.garoonDataSource.getCalendarEvents();
         return calendarEvents
             .filter(event => {
@@ -128,6 +128,6 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
                         String(specificYear + 1) === year)
                 );
             })
-            .map(event => EventConverter.convertToPublicHoliday(event));
+            .map(event => new Date(event.date));
     }
 }

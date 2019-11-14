@@ -1,6 +1,4 @@
 import { EventInfo, MyGroupEvent, Participant } from '../types/event';
-import * as base from 'garoon-soap/dist/type/base';
-import { PublicHoliday } from 'src/types/date';
 
 export default class EventConverter {
     static convertToMyGroupEvent(eventInfo: EventInfo, participants: Participant[]): MyGroupEvent {
@@ -25,9 +23,5 @@ export default class EventConverter {
             isAllDay: event.isAllDay,
             isStartOnly: event.isStartDay,
         };
-    }
-
-    static convertToPublicHoliday(calendarEvent: base.BaseGetCalendarEventType): PublicHoliday {
-        return { date: new Date(calendarEvent.date), content: calendarEvent.content };
     }
 }

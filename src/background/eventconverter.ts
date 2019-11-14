@@ -1,5 +1,4 @@
-import * as util from './util';
-import { EventInfo, MyGroupEvent, Participant } from '../model/event';
+import { EventInfo, MyGroupEvent, Participant } from '../types/event';
 
 export default class EventConverter {
     static convertToMyGroupEvent(eventInfo: EventInfo, participants: Participant[]): MyGroupEvent {

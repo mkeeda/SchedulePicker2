@@ -1,6 +1,6 @@
 import GaroonSoap from 'garoon-soap';
 import * as base from 'garoon-soap/dist/type/base';
-import { EventInfo } from '../model/event';
+import { EventInfo } from '../types/event';
 import EventConverter from './eventconverter';
 
 interface GaroonDataSource {

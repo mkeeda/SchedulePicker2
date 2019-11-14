@@ -1,4 +1,4 @@
-import { EventInfo } from '../model/event';
+import { EventInfo } from '../types/event';
 
 export const formatDate = (date: Date): string => {
     const hour = `0${date.getHours()}`.slice(-2);

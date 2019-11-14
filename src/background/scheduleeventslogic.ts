@@ -1,10 +1,10 @@
 import GaroonDataSource from './garoondatasource';
 import * as base from 'garoon-soap/dist/type/base';
 import GaroonDataSourceImpl from './garoondatasource';
-import { EventInfo, Participant, MyGroupEvent } from '../model/event';
+import { EventInfo, Participant, MyGroupEvent } from '../types/event';
 import EventConverter from '../background/eventconverter';
 import * as util from './util';
-import { DateRange } from '../model/date';
+import { DateRange } from '../types/date';
 
 interface ScheduleEventsLogic {
     getMyEvents(dateRange: DateRange, isPrivate: boolean, targetType: string, target: string): Promise<EventInfo[]>;

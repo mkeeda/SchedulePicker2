@@ -1,7 +1,7 @@
 import { DateType, ContextMenuIds, EventsType, StorageKeys } from './eventtype';
 import ScheduleEventsLogic from './scheduleeventslogic';
 import ScheduleEventsLogicImpl from './scheduleeventslogic';
-import { DateRange } from '../model/date';
+import { DateRange } from '../types/date';
 
 let previousDomain = '';
 let logic: ScheduleEventsLogic;

@@ -1,4 +1,4 @@
-import { EventMenuColor } from '../model/event';
+import { EventMenuColor } from '../types/event';
 
 // イベントメニューのカラー設定
 export const eventMenuColor = (planName: string): EventMenuColor => {

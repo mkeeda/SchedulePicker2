@@ -1,5 +1,5 @@
 import { EventsType } from '../background/eventtype';
-import { EventInfo, Participant, RecieveEventMessage, MyGroupEvent } from '../model/event';
+import { EventInfo, Participant, RecieveEventMessage, MyGroupEvent } from '../types/event';
 import { formatDate } from '../background/dateutil';
 import { eventMenuColor } from './eventmenucolor';
 

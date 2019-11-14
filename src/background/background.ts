@@ -6,6 +6,10 @@ import * as util from './util';
 let previousDomain = '';
 let logic: ScheduleEventsLogic;
 
+const showPopupWindow = (): void => {
+    window.open('../popup.html', 'extension_popup', 'width=500,height=580,status=no,scrollbars=yes,resizable=no');
+};
+
 const defaultMenuItems = [
     { id: ContextMenuIds.ROOT.toString(), title: 'SchedulePicker', type: 'normal' },
     {
@@ -125,7 +129,7 @@ const setupContextMenus = async (): Promise<void> => {
                     }
                     case ContextMenuIds.SELECT_DATE: {
                         chrome.storage.sync.set({ dateType: DateType.SECRET_DAY });
-                        util.showPopupWindow();
+                        showPopupWindow();
                         break;
                     }
                     default: {

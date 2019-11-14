@@ -117,10 +117,40 @@ const createHtmlForEventList = (eventInfoList: EventInfo[], date: Date): string 
 
 const createHtmlForMyGroupEventList = (myGroupEventList: MyGroupEvent[], date: Date): string => {
     const title = `<div>【 ${formatDate(date, 'yyyy-MM-dd')} の予定 】</div>`;
-    const body = myGroupEventList
-        .map(myGroupEvent => createHtmlForEvent(myGroupEvent.eventInfo, date, myGroupEvent.participants))
+    const regularEventList: MyGroupEvent[] = [];
+    const repeatingEventList: MyGroupEvent[] = []; // 繰り返し予定
+    const allDayEventList: MyGroupEvent[] = []; // 終日予定
+
+    myGroupEventList.forEach(groupEvent => {
+        if (groupEvent.eventInfo.eventType === 'REGULAR') {
+            regularEventList.push(groupEvent);
+        } else if (groupEvent.eventInfo.eventType === 'REPEATING') {
+            repeatingEventList.push(groupEvent);
+        } else if (groupEvent.eventInfo.eventType === 'ALL_DAY') {
+            allDayEventList.push(groupEvent);
+        } else {
+            console.log(groupEvent);
+        }
+    });
+
+    let body = `${title}`;
+    body += regularEventList
+        .map(groupEvent => createHtmlForRegularEvent(groupEvent.eventInfo, date, groupEvent.participants))
         .join('');
-    return `${title}${body}`;
+    if (repeatingEventList.length !== 0) {
+        body += '<div>［繰り返し予定］</div>';
+        body += repeatingEventList
+            .map(groupEvent => createHtmlForRepertingEvent(groupEvent.eventInfo, date, groupEvent.participants))
+            .join('');
+    }
+
+    if (allDayEventList.length !== 0) {
+        body += '<div>［終日予定］</div>';
+        body += allDayEventList
+            .map(groupEvent => createHtmlForAllDayEvent(groupEvent.eventInfo, date, groupEvent.participants))
+            .join('');
+    }
+    return body;
 };
 
 chrome.runtime.sendMessage({ domain: document.domain });

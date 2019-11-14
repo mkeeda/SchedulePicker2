@@ -1,37 +1,45 @@
-import { StorageKeys, EventsType } from '../background/eventtype';
+import { EventsType } from '../background/eventtype';
 import { EventInfo, Participant, RecieveEventMessage, MyGroupEvent } from '../model/event';
+import { formatDate } from '../background/dateutil';
 
-const createHtmlForEvent = (eventInfo: EventInfo, participants: Participant[] = []): string => {
+const createHtmlForEvent = (eventInfo: EventInfo, date: Date, participants: Participant[] = []): string => {
+    const formattedDate = formatDate(date, 'yyyy-MM-dd');
+    const startTime = formatDate(new Date(eventInfo.startTime), 'HH:mm');
+    const endTime = formatDate(new Date(eventInfo.endTime), 'HH:mm');
     return `
     <div>
-        <span>${eventInfo.startTime}-${eventInfo.endTime}</span>
+        <span>${startTime}-${endTime}</span>
         <a href="https://bozuman.cybozu.com/g/schedule/view.csp?event=${eventInfo.id}">${eventInfo.subject}</a>
         ${participants
             .map(
                 participant =>
-                    `<a href="https://bozuman.cybozu.com/g/schedule/personal_day.csp?uid=${participant.id}">${participant.name}</a>`
+                    `<a style="color: chocolate;"
+                        href="https://bozuman.cybozu.com/g/schedule/personal_day.csp?bdate=${formattedDate}&uid=${
+                        participant.id
+                    }">${participant.name.split(' ')[0]}, </a>`
             )
             .join('')}
     </div>
     `;
 };
 
-const createHtmlForEventList = (eventInfoList: EventInfo[]): string => {
-    const title = `<div>【date】の予定</div>`;
-    const body = eventInfoList.map(eventInfo => createHtmlForEvent(eventInfo)).join('');
+const createHtmlForEventList = (eventInfoList: EventInfo[], date: Date): string => {
+    const title = `<div>【 ${formatDate(date, 'yyyy-MM-dd')} の予定 】</div>`;
+    const body = eventInfoList.map(eventInfo => createHtmlForEvent(eventInfo, date)).join('');
     return `${title}${body}`;
 };
 
-const createHtmlForMyGroupEventList = (myGroupEventList: MyGroupEvent[]): string => {
-    const title = `<div>【date】の予定</div>`;
+const createHtmlForMyGroupEventList = (myGroupEventList: MyGroupEvent[], date: Date): string => {
+    const title = `<div>【 ${formatDate(date, 'yyyy-MM-dd')} の予定 】</div>`;
     const body = myGroupEventList
-        .map(myGroupEvent => createHtmlForEvent(myGroupEvent.eventInfo, myGroupEvent.participants))
+        .map(myGroupEvent => createHtmlForEvent(myGroupEvent.eventInfo, date, myGroupEvent.participants))
         .join('');
     return `${title}${body}`;
 };
 
 chrome.runtime.sendMessage({ domain: document.domain });
 
+// messageの中の参照型はすべてstringで帰ってくるので注意！！
 chrome.runtime.onMessage.addListener((message: RecieveEventMessage) => {
     // 現在フォーカスが与えられている要素を取得する
     const target = document.activeElement;
@@ -41,12 +49,12 @@ chrome.runtime.onMessage.addListener((message: RecieveEventMessage) => {
     }
 
     if (message.eventType === EventsType.MY_EVENTS) {
-        const html = createHtmlForEventList(message.events);
+        const html = createHtmlForEventList(message.events, new Date(message.dateStr));
         document.execCommand('insertHtml', false, html);
     }
 
     if (message.eventType === EventsType.MY_GROUP_EVENTS) {
-        const html = createHtmlForMyGroupEventList(message.events);
+        const html = createHtmlForMyGroupEventList(message.events, new Date(message.dateStr));
         document.execCommand('insertHtml', false, html);
     }
 });

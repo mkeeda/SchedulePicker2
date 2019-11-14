@@ -3,8 +3,8 @@ import { EventsType } from '../background/eventtype';
 export interface EventInfo {
     id: string;
     subject: string;
-    startTime: string;
-    endTime: string;
+    startTime: Date;
+    endTime: Date;
     eventType: string;
     eventMenu: string;
     visibilityType: string;
@@ -25,5 +25,6 @@ export interface MyGroupEvent {
 
 export interface RecieveEventMessage {
     eventType: EventsType;
+    dateStr: string;
     events: any;
 }

@@ -66,32 +66,29 @@ const createContextMenuItems = async (myGroupMenuItems): Promise<any> => {
     return defaultMenuItems.concat(myGroupMenuItems);
 };
 
-const findDateRangeFromType = (type: DateType, selectedDate: Date): DateRange => {
-    const now = new Date();
+const makeDataRange = (date: Date): DateRange => {
+    const startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const endDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
+    return { startDate: startDate, endDate: endDate };
+};
 
+const findDateRangeFromType = (type: DateType, selectedDateStr: string): DateRange => {
     switch (type) {
         case DateType.TODAY: {
-            const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-            return { startDate: startDate, endDate: endDate };
+            return makeDataRange(new Date());
         }
         case DateType.NEXT_BUSINESS_DAY:
             // TODO: 翌営業日を返す
-            return { startDate: now, endDate: now };
+            return { startDate: new Date(), endDate: new Date() };
         case DateType.PREVIOUS_BUSINESS_DAY:
             // TODO: 前営業日を返す
-            return { startDate: now, endDate: now };
+            return { startDate: new Date(), endDate: new Date() };
         case DateType.SELECT_DAY: {
-            const startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
-            const endDate = new Date(
-                selectedDate.getFullYear(),
-                selectedDate.getMonth(),
-                selectedDate.getDate(),
-                23,
-                59,
-                59
-            );
-            return { startDate: startDate, endDate: endDate };
+            if (selectedDateStr === '') {
+                return makeDataRange(new Date());
+            } else {
+                return makeDataRange(new Date(selectedDateStr));
+            }
         }
         default: {
             throw new Error('DateTypeが存在しません');
@@ -135,10 +132,11 @@ const setupContextMenus = async (): Promise<void> => {
                 try {
                     switch (info.menuItemId) {
                         case ContextMenuIds.MYSELF: {
-                            const dateRange = findDateRangeFromType(items.dateType, new Date(items.date));
+                            const dateRange = findDateRangeFromType(items.dateType, items.date);
                             const eventInfoList = await logic.getSortedMyEvents(dateRange);
                             chrome.tabs.sendMessage(tab!.id!, {
                                 eventType: EventsType.MY_EVENTS,
+                                dateStr: dateRange.startDate.toString(),
                                 events: eventInfoList,
                             });
                             break;
@@ -169,10 +167,11 @@ const setupContextMenus = async (): Promise<void> => {
                             break;
                         }
                         default: {
-                            const dateRange = findDateRangeFromType(items.dateType, new Date(items.date));
+                            const dateRange = findDateRangeFromType(items.dateType, items.date);
                             const myGroupEventList = await logic.getMyGroupSchedule(dateRange, info.menuItemId);
                             chrome.tabs.sendMessage(tab!.id!, {
                                 eventType: EventsType.MY_GROUP_EVENTS,
+                                dateStr: dateRange.startDate.toString(),
                                 events: myGroupEventList,
                             });
                             break;

@@ -8,11 +8,11 @@ export const formatDate = (date: Date): string => {
 };
 
 export const sortByTimeFunc = (eventInfo: EventInfo, nextEventInfo: EventInfo): number => {
-    if (new Date(eventInfo.startTime) > new Date(nextEventInfo.startTime)) {
+    if (eventInfo.startTime > nextEventInfo.startTime) {
         return 1; // nextEvent, event の順番に並べ替える
     }
 
-    if (new Date(eventInfo.startTime) < new Date(nextEventInfo.startTime)) {
+    if (eventInfo.startTime < nextEventInfo.startTime) {
         return -1; // event, nextEvent の順番に並べ替える
     }
 

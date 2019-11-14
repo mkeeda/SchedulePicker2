@@ -27,4 +27,5 @@ export interface RecieveEventMessage {
     eventType: EventsType;
     dateStr: string;
     events: any;
+    templateText: string;
 }

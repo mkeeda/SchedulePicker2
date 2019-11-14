@@ -142,7 +142,14 @@ const setupContextMenus = async (): Promise<void> => {
                             break;
                         }
                         case ContextMenuIds.TEMPLATE: {
-                            chrome.tabs.sendMessage(tab!.id!, ContextMenuIds.TEMPLATE);
+                            const dateRange = findDateRangeFromType(DateType.TODAY, items.date);
+                            const eventInfoList = await logic.getSortedMyEvents(dateRange);
+                            chrome.tabs.sendMessage(tab!.id!, {
+                                eventType: EventsType.TEMPLATE,
+                                dateStr: dateRange.startDate.toString(),
+                                events: eventInfoList,
+                                templateText: items.templateText,
+                            });
                             break;
                         }
                         case ContextMenuIds.MYGROUP_UPDATE: {
@@ -178,7 +185,7 @@ const setupContextMenus = async (): Promise<void> => {
                         }
                     }
                 } catch (e) {
-                    chrome.tabs.sendMessage(tab!.id!, { eventType: EventsType.ERROR, events: [] });
+                    chrome.tabs.sendMessage(tab!.id!, { eventType: EventsType.ERROR });
                 }
             }
         );

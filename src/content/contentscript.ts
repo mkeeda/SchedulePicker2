@@ -57,4 +57,9 @@ chrome.runtime.onMessage.addListener((message: RecieveEventMessage) => {
         const html = createHtmlForMyGroupEventList(message.events, new Date(message.dateStr));
         document.execCommand('insertHtml', false, html);
     }
+
+    if (message.eventType === EventsType.TEMPLATE) {
+        // TODO: テンプレートの解析処理を挟む
+        document.execCommand('insertText', false, message.templateText);
+    }
 });

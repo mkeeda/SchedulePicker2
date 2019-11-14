@@ -1,6 +1,7 @@
 import { DateType, ContextMenuIds, EventsType, StorageKeys } from './eventtype';
 import ScheduleEventsLogic from './scheduleeventslogic';
 import ScheduleEventsLogicImpl from './scheduleeventslogic';
+import * as util from './util';
 
 let previousDomain = '';
 let logic: ScheduleEventsLogic;
@@ -124,7 +125,7 @@ const setupContextMenus = async (): Promise<void> => {
                     }
                     case ContextMenuIds.SELECT_DATE: {
                         chrome.storage.sync.set({ dateType: DateType.SECRET_DAY });
-                        // TODO ダイアログを表示する
+                        util.showPopupWindow();
                         break;
                     }
                     default: {

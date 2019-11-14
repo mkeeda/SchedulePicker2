@@ -18,3 +18,7 @@ export const sortByTimeFunc = (eventInfo: EventInfo, nextEventInfo: EventInfo): 
 
     return 0;
 };
+
+export const showPopupWindow = (): void => {
+    window.open('../popup.html', 'extension_popup', 'width=500,height=580,status=no,scrollbars=yes,resizable=no');
+};

@@ -2,7 +2,7 @@ export enum DateType {
     TODAY,
     NEXT_BUSINESS_DAY,
     PREVIOUS_BUSINESS_DAY,
-    SECRET_DAY,
+    SELECT_DAY,
 }
 
 export enum ContextMenuIds {

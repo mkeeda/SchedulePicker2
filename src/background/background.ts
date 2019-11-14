@@ -132,6 +132,7 @@ const setupContextMenus = async (): Promise<void> => {
                 try {
                     switch (info.menuItemId) {
                         case ContextMenuIds.MYSELF: {
+                            chrome.tabs.sendMessage(tab!.id!, { eventType: EventsType.NOW_LOADING });
                             const dateRange = findDateRangeFromType(items.dateType, items.date);
                             const eventInfoList = await logic.getSortedMyEvents(dateRange, items.isPrivate);
                             chrome.tabs.sendMessage(tab!.id!, {
@@ -142,6 +143,7 @@ const setupContextMenus = async (): Promise<void> => {
                             break;
                         }
                         case ContextMenuIds.TEMPLATE: {
+                            chrome.tabs.sendMessage(tab!.id!, { eventType: EventsType.NOW_LOADING });
                             const dateRange = findDateRangeFromType(DateType.TODAY, items.date);
                             const eventInfoList = await logic.getSortedMyEvents(dateRange, items.isPrivate);
                             chrome.tabs.sendMessage(tab!.id!, {
@@ -174,6 +176,7 @@ const setupContextMenus = async (): Promise<void> => {
                             break;
                         }
                         default: {
+                            chrome.tabs.sendMessage(tab!.id!, { eventType: EventsType.NOW_LOADING });
                             const dateRange = findDateRangeFromType(items.dateType, items.date);
                             const myGroupEventList = await logic.getMyGroupSchedule(
                                 dateRange,

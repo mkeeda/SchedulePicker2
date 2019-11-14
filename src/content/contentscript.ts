@@ -119,10 +119,20 @@ chrome.runtime.sendMessage({ domain: document.domain });
 
 // messageの中の参照型はすべてstringで帰ってくるので注意！！
 chrome.runtime.onMessage.addListener((message: RecieveEventMessage) => {
+    if (message.eventType === EventsType.ERROR) {
+        return;
+    }
+
+    if (message.eventType === EventsType.NOW_LOADING) {
+        document.body.style.cursor = 'progress';
+        return;
+    }
+
     // 現在フォーカスが与えられている要素を取得する
     const target = document.activeElement;
     // フォーカスが外れているときactiveElementはnullかbodyを返す
-    if (target === null || target.tagName === 'BODY' || message.eventType === EventsType.ERROR) {
+    if (target === null || target.tagName === 'BODY') {
+        document.body.style.cursor = 'auto';
         return;
     }
 
@@ -140,4 +150,5 @@ chrome.runtime.onMessage.addListener((message: RecieveEventMessage) => {
         // TODO: テンプレートの解析処理を挟む
         document.execCommand('insertText', false, message.templateText);
     }
+    document.body.style.cursor = 'auto';
 });

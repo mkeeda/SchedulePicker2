@@ -21,6 +21,7 @@ export enum EventsType {
     MY_EVENTS,
     MY_GROUP_EVENTS,
     TEMPLATE,
+    NOW_LOADING,
     ERROR,
 }
 

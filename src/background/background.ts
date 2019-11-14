@@ -1,4 +1,4 @@
-import { ScheduleEventType, ContextMenuIds, EventsType, StorageKeys } from './eventtype';
+import { DateType, ContextMenuIds, EventsType, StorageKeys } from './eventtype';
 import ScheduleEventsLogic from './scheduleeventslogic';
 import ScheduleEventsLogicImpl from './scheduleeventslogic';
 
@@ -7,7 +7,12 @@ let logic: ScheduleEventsLogic;
 
 const defaultMenuItems = [
     { id: ContextMenuIds.ROOT.toString(), title: 'SchedulePicker', type: 'normal' },
-    { id: ContextMenuIds.TODAY.toString(), title: '今日', parentId: ContextMenuIds.ROOT, type: 'radio' },
+    {
+        id: ContextMenuIds.TODAY.toString(),
+        title: '今日',
+        parentId: ContextMenuIds.ROOT,
+        type: 'radio',
+    },
     {
         id: ContextMenuIds.NEXT_BUSINESS_DAY.toString(),
         title: '翌営業日',
@@ -20,15 +25,36 @@ const defaultMenuItems = [
         parentId: ContextMenuIds.ROOT,
         type: 'radio',
     },
-    { id: ContextMenuIds.MYSELF.toString(), title: '自分', parentId: ContextMenuIds.ROOT, type: 'normal' },
-    { id: ContextMenuIds.MYGROUP.toString(), title: 'MYグループ', parentId: ContextMenuIds.ROOT, type: 'normal' },
+    {
+        id: ContextMenuIds.SELECT_DATE.toString(),
+        title: '指定日',
+        parentId: ContextMenuIds.ROOT,
+        type: 'radio',
+    },
+    {
+        id: ContextMenuIds.MYSELF.toString(),
+        title: '自分',
+        parentId: ContextMenuIds.ROOT,
+        type: 'normal',
+    },
+    {
+        id: ContextMenuIds.MYGROUP.toString(),
+        title: 'MYグループ',
+        parentId: ContextMenuIds.ROOT,
+        type: 'normal',
+    },
     {
         id: ContextMenuIds.MYGROUP_UPDATE.toString(),
         title: '【 MYグループの更新 】',
         parentId: ContextMenuIds.MYGROUP,
         type: 'normal',
     },
-    { id: ContextMenuIds.TEMPLATE.toString(), title: 'テンプレート', parentId: ContextMenuIds.ROOT, type: 'normal' },
+    {
+        id: ContextMenuIds.TEMPLATE.toString(),
+        title: 'テンプレート',
+        parentId: ContextMenuIds.ROOT,
+        type: 'normal',
+    },
 ];
 
 const createContextMenuItems = async (myGroupMenuItems): Promise<any> => {
@@ -69,12 +95,11 @@ const setupContextMenus = async (): Promise<void> => {
             try {
                 switch (info.menuItemId) {
                     case ContextMenuIds.MYSELF: {
-                        const eventInfoList = await logic.getSortedMyEvents(ScheduleEventType.TODAY);
-                        chrome.tabs.sendMessage(tab!.id!, { eventType: EventsType.MY_EVENTS, events: eventInfoList });
-                        break;
-                    }
-                    case ContextMenuIds.NEXT_BUSINESS_DAY: {
-                        chrome.tabs.sendMessage(tab!.id!, ContextMenuIds.NEXT_BUSINESS_DAY);
+                        const eventInfoList = await logic.getSortedMyEvents(DateType.TODAY);
+                        chrome.tabs.sendMessage(tab!.id!, {
+                            eventType: EventsType.MY_EVENTS,
+                            events: eventInfoList,
+                        });
                         break;
                     }
                     case ContextMenuIds.TEMPLATE: {
@@ -85,11 +110,25 @@ const setupContextMenus = async (): Promise<void> => {
                         updateContextMenus();
                         break;
                     }
+                    case ContextMenuIds.TODAY: {
+                        chrome.storage.sync.set({ dateType: DateType.TODAY });
+                        break;
+                    }
+                    case ContextMenuIds.NEXT_BUSINESS_DAY: {
+                        chrome.storage.sync.set({ dateType: DateType.NEXT_BUSINESS_DAY });
+                        break;
+                    }
+                    case ContextMenuIds.PREVIOUS_BUSINESS_DAY: {
+                        chrome.storage.sync.set({ dateType: DateType.PREVIOUS_BUSINESS_DAY });
+                        break;
+                    }
+                    case ContextMenuIds.SELECT_DATE: {
+                        chrome.storage.sync.set({ dateType: DateType.SECRET_DAY });
+                        // TODO ダイアログを表示する
+                        break;
+                    }
                     default: {
-                        const myGroupEventList = await logic.getMyGroupSchedule(
-                            ScheduleEventType.TODAY,
-                            info.menuItemId
-                        );
+                        const myGroupEventList = await logic.getMyGroupSchedule(DateType.TODAY, info.menuItemId);
                         chrome.tabs.sendMessage(tab!.id!, {
                             eventType: EventsType.MY_GROUP_EVENTS,
                             events: myGroupEventList,

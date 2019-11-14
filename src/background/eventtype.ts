@@ -1,15 +1,16 @@
 export enum DateType {
     TODAY,
     NEXT_BUSINESS_DAY,
-    SECRET,
+    PREVIOUS_BUSINESS_DAY,
+    SECRET_DAY,
 }
 
 export enum ContextMenuIds {
     ROOT = 'root',
-    SELECT_DATE = 'select_date',
     TODAY = 'today',
     NEXT_BUSINESS_DAY = 'next_business_day',
-    PREVIOUS_BUSINESS_DAY = 'previous_bisiness_day',
+    PREVIOUS_BUSINESS_DAY = 'previous_business_day',
+    SELECT_DATE = 'select_date',
     MYSELF = 'myself',
     MYGROUP = 'mygroup',
     MYGROUP_UPDATE = 'mygroup_update',
@@ -26,4 +27,7 @@ export enum StorageKeys {
     IS_INCLUDE = 'isInclude',
     DATE = 'date',
     TEMPLATE_TEXT = 'templateText',
+
+    // 日付のタイプ
+    DATE_TYPE = 'dateType',
 }

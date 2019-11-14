@@ -133,7 +133,7 @@ const setupContextMenus = async (): Promise<void> => {
                     switch (info.menuItemId) {
                         case ContextMenuIds.MYSELF: {
                             const dateRange = findDateRangeFromType(items.dateType, items.date);
-                            const eventInfoList = await logic.getSortedMyEvents(dateRange);
+                            const eventInfoList = await logic.getSortedMyEvents(dateRange, items.isPrivate);
                             chrome.tabs.sendMessage(tab!.id!, {
                                 eventType: EventsType.MY_EVENTS,
                                 dateStr: dateRange.startDate.toString(),
@@ -143,7 +143,7 @@ const setupContextMenus = async (): Promise<void> => {
                         }
                         case ContextMenuIds.TEMPLATE: {
                             const dateRange = findDateRangeFromType(DateType.TODAY, items.date);
-                            const eventInfoList = await logic.getSortedMyEvents(dateRange);
+                            const eventInfoList = await logic.getSortedMyEvents(dateRange, items.isPrivate);
                             chrome.tabs.sendMessage(tab!.id!, {
                                 eventType: EventsType.TEMPLATE,
                                 dateStr: dateRange.startDate.toString(),
@@ -175,7 +175,11 @@ const setupContextMenus = async (): Promise<void> => {
                         }
                         default: {
                             const dateRange = findDateRangeFromType(items.dateType, items.date);
-                            const myGroupEventList = await logic.getMyGroupSchedule(dateRange, info.menuItemId);
+                            const myGroupEventList = await logic.getMyGroupSchedule(
+                                dateRange,
+                                items.isPrivate,
+                                info.menuItemId
+                            );
                             chrome.tabs.sendMessage(tab!.id!, {
                                 eventType: EventsType.MY_GROUP_EVENTS,
                                 dateStr: dateRange.startDate.toString(),

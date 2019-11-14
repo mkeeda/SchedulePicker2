@@ -13,7 +13,7 @@ export class PrivateSchedule extends LitElement {
     render(): TemplateResult {
         return html`
             <div>
-                <span>非公開予定を含む：</span>
+                <span>非公開予定を表示しない：</span>
                 <input class="checkbox" type="checkbox" .checked=${this.isPrivate} @click=${this.onClickedCheckbox} />
             </div>
         `;

@@ -1,13 +1,15 @@
 import GaroonSoap from 'garoon-soap';
 import * as base from 'garoon-soap/dist/type/base';
+import { EventInfo } from '../model/event';
+import EventConverter from './eventconverter';
 
-interface GaroonService {
-    getScheduleEvents(rangeStart: string, rangeEnd: string, targetType: string, target: string): Promise<any>;
+interface GaroonDataSource {
+    getScheduleEvents(rangeStart: string, rangeEnd: string, targetType: string, target: string): Promise<EventInfo[]>;
     getMyGroupVersions(myGroupItems: base.ItemVersionType[]): Promise<base.ItemVersionResultType[]>;
     getMyGroupsById(id: string[]): Promise<base.MyGroupType[]>;
 }
 
-export default class GaroonServiceImpl implements GaroonService {
+export default class GaroonDataSourceImpl implements GaroonDataSource {
     private baseUrl: string;
     private PATH = 'api/v1/';
     private soap: GaroonSoap;
@@ -17,7 +19,7 @@ export default class GaroonServiceImpl implements GaroonService {
         this.soap = new GaroonSoap(this.baseUrl);
     }
 
-    getScheduleEvents(rangeStart: string, rangeEnd: string, targetType = '', target = ''): Promise<any> {
+    async getScheduleEvents(rangeStart: string, rangeEnd: string, targetType = '', target = ''): Promise<EventInfo[]> {
         const url = new URL(`${this.baseUrl}${this.PATH}schedule/events`);
         url.searchParams.append('orderBy', 'start asc');
 
@@ -37,9 +39,13 @@ export default class GaroonServiceImpl implements GaroonService {
             url.searchParams.append('target', target);
         }
 
-        return fetch(url.toString(), {
+        const respStream = await fetch(url.toString(), {
             method: 'GET',
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        });
+        const respJson = await respStream.json();
+        return respJson.events.map(event => {
+            return EventConverter.convertToEventInfo(event);
         });
     }
 

@@ -193,6 +193,7 @@ const setupContextMenus = async (): Promise<void> => {
                     }
                 } catch (e) {
                     chrome.tabs.sendMessage(tab!.id!, { eventType: EventsType.ERROR });
+                    throw new Error(e.message);
                 }
             }
         );

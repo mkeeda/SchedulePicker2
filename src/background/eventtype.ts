@@ -29,7 +29,5 @@ export enum StorageKeys {
     IS_PRIVATE = 'isPrivate',
     DATE = 'date',
     TEMPLATE_TEXT = 'templateText',
-
-    // 日付のタイプ
-    DATE_TYPE = 'dateType',
+    DATE_TYPE = 'dateType', // 日付のタイプ
 }

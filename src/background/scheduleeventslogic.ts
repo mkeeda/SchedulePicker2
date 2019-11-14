@@ -1,12 +1,10 @@
 import GaroonDataSource from './garoondatasource';
-import { DateType } from './eventtype';
 import * as base from 'garoon-soap/dist/type/base';
 import GaroonDataSourceImpl from './garoondatasource';
 import { EventInfo, Participant, MyGroupEvent } from '../model/event';
 import EventConverter from '../background/eventconverter';
 import * as util from './util';
 import { DateRange } from '../model/date';
-import { isPrimitive } from 'lit-html';
 
 interface ScheduleEventsLogic {
     getMyEvents(dateRange: DateRange, isPrivate: boolean, targetType: string, target: string): Promise<EventInfo[]>;
@@ -47,7 +45,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         targetType = '',
         target = ''
     ): Promise<EventInfo[]> {
-        const eventInfoList = await this.getMyEvents(dateRange, isPrivate);
+        const eventInfoList = await this.getMyEvents(dateRange, isPrivate, targetType, target);
         return eventInfoList.sort(util.sortByTimeFunc);
     }
 

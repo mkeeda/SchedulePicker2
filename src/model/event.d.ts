@@ -29,3 +29,9 @@ export interface RecieveEventMessage {
     events: any;
     templateText: string;
 }
+
+export interface EventMenuColor {
+    r: number;
+    g: number;
+    b: number;
+}

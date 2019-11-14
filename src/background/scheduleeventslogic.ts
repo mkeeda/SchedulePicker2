@@ -15,7 +15,7 @@ interface ScheduleEventsLogic {
         target: string
     ): Promise<EventInfo[]>;
     getMyGroups(): Promise<base.MyGroupType[]>;
-    getMyGroupSchedule(dateRange: DateRange, isPrivate: boolean, groupId: string): Promise<any>;
+    getMyGroupEvents(dateRange: DateRange, isPrivate: boolean, groupId: string): Promise<MyGroupEvent[]>;
     getNarrowedDownPublicHolidays(specificYear: number): Promise<PublicHoliday[]>;
 }
 
@@ -57,7 +57,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         return this.garoonDataSource.getMyGroupsById(myGroupIds);
     }
 
-    async getMyGroupSchedule(dateRange: DateRange, isPrivate: boolean, groupId: string): Promise<MyGroupEvent[]> {
+    async getMyGroupEvents(dateRange: DateRange, isPrivate: boolean, groupId: string): Promise<MyGroupEvent[]> {
         const myGroups = await this.getMyGroups();
         const targetMyGroups = myGroups.filter(g => g.key === groupId);
 

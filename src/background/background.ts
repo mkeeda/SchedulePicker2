@@ -181,7 +181,7 @@ const setupContextMenus = async (): Promise<void> => {
                             chrome.tabs.sendMessage(tab!.id!, { eventType: EventsType.NOW_LOADING });
                             const dateRange = findDateRangeFromType(items.dateType, items.date);
                             const publicHolidays = await logic.getNarrowedDownPublicHolidays(new Date().getFullYear());
-                            const myGroupEventList = await logic.getMyGroupSchedule(
+                            const myGroupEventList = await logic.getMyGroupEvents(
                                 dateRange,
                                 items.isPrivate,
                                 info.menuItemId

@@ -3,7 +3,7 @@ import { LitElement, html, css, property, customElement, TemplateResult } from '
 @customElement('private-schedule')
 export class PrivateSchedule extends LitElement {
     @property({ type: Boolean })
-    isInclude = false;
+    isPrivate = false;
 
     @property({ type: Object })
     onClickedCheckbox = (): never => {
@@ -14,7 +14,7 @@ export class PrivateSchedule extends LitElement {
         return html`
             <div>
                 <span>非公開予定を含む：</span>
-                <input class="checkbox" type="checkbox" .checked=${this.isInclude} @click=${this.onClickedCheckbox} />
+                <input class="checkbox" type="checkbox" .checked=${this.isPrivate} @click=${this.onClickedCheckbox} />
             </div>
         `;
     }

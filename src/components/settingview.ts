@@ -8,7 +8,7 @@ import './savebutton';
 @customElement('setting-view')
 export class SettingView extends LitElement {
     @property({ type: Boolean })
-    isInclude = false;
+    isPrivate = false;
 
     @property({ type: String })
     date = '';
@@ -22,9 +22,9 @@ export class SettingView extends LitElement {
     }
 
     private initProperties = (): void => {
-        chrome.storage.sync.get([StorageKeys.IS_INCLUDE, StorageKeys.DATE, StorageKeys.TEMPLATE_TEXT], item => {
-            if (item.isInclude != null) {
-                this.isInclude = item.isInclude;
+        chrome.storage.sync.get([StorageKeys.IS_PRIVATE, StorageKeys.DATE, StorageKeys.TEMPLATE_TEXT], item => {
+            if (item.isPrivate != null) {
+                this.isPrivate = item.isPrivate;
             }
 
             if (item.date != null) {
@@ -38,7 +38,7 @@ export class SettingView extends LitElement {
     };
 
     onClickedCheckbox = (e): void => {
-        this.isInclude = e.currentTarget.checked;
+        this.isPrivate = e.currentTarget.checked;
     };
 
     onSelectedDate = (e): void => {
@@ -51,7 +51,7 @@ export class SettingView extends LitElement {
 
     onClickedSave = (): void => {
         chrome.storage.sync.set({
-            isInclude: this.isInclude,
+            isPrivate: this.isPrivate,
             date: this.date,
             templateText: this.templateText,
         });
@@ -61,7 +61,7 @@ export class SettingView extends LitElement {
         return html`
             <main>
                 <private-schedule
-                    .isInclude=${this.isInclude}
+                    .isPrivate=${this.isPrivate}
                     .onClickedCheckbox=${this.onClickedCheckbox}
                 ></private-schedule>
                 <select-date .date=${this.date} .onSelectedDate=${this.onSelectedDate}></select-date>

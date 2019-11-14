@@ -92,7 +92,7 @@ const setupContextMenus = async (): Promise<void> => {
     });
 
     chrome.contextMenus.onClicked.addListener((info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) => {
-        chrome.storage.sync.get([StorageKeys.IS_INCLUDE, StorageKeys.DATE, StorageKeys.TEMPLATE_TEXT], async items => {
+        chrome.storage.sync.get([StorageKeys.IS_PRIVATE, StorageKeys.DATE, StorageKeys.TEMPLATE_TEXT], async items => {
             try {
                 switch (info.menuItemId) {
                     case ContextMenuIds.MYSELF: {

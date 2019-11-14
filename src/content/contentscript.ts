@@ -4,7 +4,7 @@ import { EventInfo, Participant, RecieveEventMessage, MyGroupEvent } from '../mo
 const createHtmlForEvent = (eventInfo: EventInfo, participants: Participant[] = []): string => {
     return `
     <div>
-        <span>${eventInfo.startTime}-${eventInfo.startTime}</span>
+        <span>${eventInfo.startTime}-${eventInfo.endTime}</span>
         <a href="https://bozuman.cybozu.com/g/schedule/view.csp?event=${eventInfo.id}">${eventInfo.subject}</a>
         ${participants
             .map(

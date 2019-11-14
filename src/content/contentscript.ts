@@ -2,49 +2,7 @@ import { EventsType } from '../background/eventtype';
 import { EventInfo, Participant, RecieveEventMessage, MyGroupEvent } from '../model/event';
 import { formatDate } from '../background/dateutil';
 
-const createHtmlForEvent = (eventInfo: EventInfo, date: Date, participants: Participant[] = []): string => {
-    const formattedDate = formatDate(date, 'yyyy-MM-dd');
-    const startTime = formatDate(new Date(eventInfo.startTime), 'HH:mm');
-    const endTime = formatDate(new Date(eventInfo.endTime), 'HH:mm');
-    return `
-    <div>
-        <span>${startTime}-${endTime}</span>
-        <a href="https://bozuman.cybozu.com/g/schedule/view.csp?event=${eventInfo.id}">${eventInfo.subject}</a>
-        ${participants
-            .map(
-                participant =>
-                    `<a style="color: chocolate;"
-                        href="https://bozuman.cybozu.com/g/schedule/personal_day.csp?bdate=${formattedDate}&uid=${
-                        participant.id
-                    }">${participant.name.split(' ')[0]}, </a>`
-            )
-            .join('')}
-    </div>
-    `;
-};
-
 const createHtmlForRegularEvent = (eventInfo: EventInfo, date: Date, participants: Participant[] = []): string => {
-    const formattedDate = formatDate(date, 'yyyy-MM-dd');
-    const startTime = formatDate(new Date(eventInfo.startTime), 'HH:mm');
-    const endTime = formatDate(new Date(eventInfo.endTime), 'HH:mm');
-    return `
-    <div>
-        <span>${startTime}-${endTime}</span>
-        <a href="https://bozuman.cybozu.com/g/schedule/view.csp?event=${eventInfo.id}">${eventInfo.subject}</a>
-        ${participants
-            .map(
-                participant =>
-                    `<a style="color: chocolate;"
-                        href="https://bozuman.cybozu.com/g/schedule/personal_day.csp?bdate=${formattedDate}&uid=${
-                        participant.id
-                    }">${participant.name.split(' ')[0]}, </a>`
-            )
-            .join('')}
-    </div>
-    `;
-};
-
-const createHtmlForRepertingEvent = (eventInfo: EventInfo, date: Date, participants: Participant[] = []): string => {
     const formattedDate = formatDate(date, 'yyyy-MM-dd');
     const startTime = formatDate(new Date(eventInfo.startTime), 'HH:mm');
     const endTime = formatDate(new Date(eventInfo.endTime), 'HH:mm');
@@ -86,14 +44,11 @@ const createHtmlForAllDayEvent = (eventInfo: EventInfo, date: Date, participants
 const createHtmlForEventList = (eventInfoList: EventInfo[], date: Date): string => {
     const title = `<div>【 ${formatDate(date, 'yyyy-MM-dd')} の予定 】</div>`;
     const regularEventList: EventInfo[] = [];
-    const repeatingEventList: EventInfo[] = []; // 繰り返し予定
     const allDayEventList: EventInfo[] = []; // 終日予定
 
     eventInfoList.forEach(eventInfo => {
-        if (eventInfo.eventType === 'REGULAR') {
+        if (eventInfo.eventType === 'REGULAR' || eventInfo.eventType === 'REPEATING') {
             regularEventList.push(eventInfo);
-        } else if (eventInfo.eventType === 'REPEATING') {
-            repeatingEventList.push(eventInfo);
         } else if (eventInfo.eventType === 'ALL_DAY') {
             allDayEventList.push(eventInfo);
         } else {
@@ -103,13 +58,8 @@ const createHtmlForEventList = (eventInfoList: EventInfo[], date: Date): string 
 
     let body = `${title}`;
     body += regularEventList.map(eventInfo => createHtmlForRegularEvent(eventInfo, date)).join('');
-    if (repeatingEventList.length !== 0) {
-        body += '<div>［繰り返し予定］</div>';
-        body += repeatingEventList.map(eventInfo => createHtmlForRepertingEvent(eventInfo, date)).join('');
-    }
-
     if (allDayEventList.length !== 0) {
-        body += '<div>［終日予定］</div>';
+        body += '<br><div>［終日予定］</div>';
         body += allDayEventList.map(eventInfo => createHtmlForAllDayEvent(eventInfo, date)).join('');
     }
     return body;
@@ -118,14 +68,11 @@ const createHtmlForEventList = (eventInfoList: EventInfo[], date: Date): string 
 const createHtmlForMyGroupEventList = (myGroupEventList: MyGroupEvent[], date: Date): string => {
     const title = `<div>【 ${formatDate(date, 'yyyy-MM-dd')} の予定 】</div>`;
     const regularEventList: MyGroupEvent[] = [];
-    const repeatingEventList: MyGroupEvent[] = []; // 繰り返し予定
     const allDayEventList: MyGroupEvent[] = []; // 終日予定
 
     myGroupEventList.forEach(groupEvent => {
-        if (groupEvent.eventInfo.eventType === 'REGULAR') {
+        if (groupEvent.eventInfo.eventType === 'REGULAR' || groupEvent.eventInfo.eventType === 'REPEATING') {
             regularEventList.push(groupEvent);
-        } else if (groupEvent.eventInfo.eventType === 'REPEATING') {
-            repeatingEventList.push(groupEvent);
         } else if (groupEvent.eventInfo.eventType === 'ALL_DAY') {
             allDayEventList.push(groupEvent);
         } else {
@@ -137,15 +84,8 @@ const createHtmlForMyGroupEventList = (myGroupEventList: MyGroupEvent[], date: D
     body += regularEventList
         .map(groupEvent => createHtmlForRegularEvent(groupEvent.eventInfo, date, groupEvent.participants))
         .join('');
-    if (repeatingEventList.length !== 0) {
-        body += '<div>［繰り返し予定］</div>';
-        body += repeatingEventList
-            .map(groupEvent => createHtmlForRepertingEvent(groupEvent.eventInfo, date, groupEvent.participants))
-            .join('');
-    }
-
     if (allDayEventList.length !== 0) {
-        body += '<div>［終日予定］</div>';
+        body += '<br><div>［終日予定］</div>';
         body += allDayEventList
             .map(groupEvent => createHtmlForAllDayEvent(groupEvent.eventInfo, date, groupEvent.participants))
             .join('');

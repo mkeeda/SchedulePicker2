@@ -2,41 +2,35 @@ import { EventsType } from '../background/eventtype';
 import { EventInfo, Participant, RecieveEventMessage, MyGroupEvent } from '../model/event';
 import { formatDate } from '../background/dateutil';
 
-const createHtmlForRegularEvent = (eventInfo: EventInfo, date: Date, participants: Participant[] = []): string => {
+const isAlldayInRegularEvent = (eventInfo: EventInfo) => {
+    const startTime = formatDate(new Date(eventInfo.startTime), 'HH:mm');
+    const endTime = formatDate(new Date(eventInfo.endTime), 'HH:mm');
+    return startTime === '00:00' && endTime === '23:59';
+};
+
+const createHtmlForItem = (eventInfo: EventInfo, date: Date, participants: Participant[] = []): string => {
     const formattedDate = formatDate(date, 'yyyy-MM-dd');
+    return `
+        <a href="https://bozuman.cybozu.com/g/schedule/view.csp?event=${eventInfo.id}">${eventInfo.subject}</a>
+        ${participants
+            .map(
+                participant =>
+                    `<a style="color: chocolate;"
+                        href="https://bozuman.cybozu.com/g/schedule/personal_day.csp?bdate=${formattedDate}&uid=${
+                        participant.id
+                    }">${participant.name.split(' ')[0]}, </a>`
+            )
+            .join('')}
+    `;
+};
+
+const createHtmlForItemWithTimeRange = (eventInfo: EventInfo, date: Date, participants: Participant[] = []): string => {
     const startTime = formatDate(new Date(eventInfo.startTime), 'HH:mm');
     const endTime = formatDate(new Date(eventInfo.endTime), 'HH:mm');
     return `
     <div>
         <span>${startTime}-${endTime}</span>
-        <a href="https://bozuman.cybozu.com/g/schedule/view.csp?event=${eventInfo.id}">${eventInfo.subject}</a>
-        ${participants
-            .map(
-                participant =>
-                    `<a style="color: chocolate;"
-                        href="https://bozuman.cybozu.com/g/schedule/personal_day.csp?bdate=${formattedDate}&uid=${
-                        participant.id
-                    }">${participant.name.split(' ')[0]}, </a>`
-            )
-            .join('')}
-    </div>
-    `;
-};
-
-const createHtmlForAllDayEvent = (eventInfo: EventInfo, date: Date, participants: Participant[] = []): string => {
-    const formattedDate = formatDate(date, 'yyyy-MM-dd');
-    return `
-    <div>
-        <a href="https://bozuman.cybozu.com/g/schedule/view.csp?event=${eventInfo.id}">${eventInfo.subject}</a>
-        ${participants
-            .map(
-                participant =>
-                    `<a style="color: chocolate;"
-                        href="https://bozuman.cybozu.com/g/schedule/personal_day.csp?bdate=${formattedDate}&uid=${
-                        participant.id
-                    }">${participant.name.split(' ')[0]}, </a>`
-            )
-            .join('')}
+        ${createHtmlForItem(eventInfo, date, participants)}
     </div>
     `;
 };
@@ -57,10 +51,18 @@ const createHtmlForEventList = (eventInfoList: EventInfo[], date: Date): string 
     });
 
     let body = `${title}`;
-    body += regularEventList.map(eventInfo => createHtmlForRegularEvent(eventInfo, date)).join('');
+    body += regularEventList.map(eventInfo => {
+        if (isAlldayInRegularEvent(eventInfo)) {
+            return `<div>${createHtmlForItem(eventInfo, date)}</div>`;
+        } else {
+            return createHtmlForItemWithTimeRange(eventInfo, date);
+
+        }
+    }).join('');
+    
     if (allDayEventList.length !== 0) {
         body += '<br><div>［終日予定］</div>';
-        body += allDayEventList.map(eventInfo => createHtmlForAllDayEvent(eventInfo, date)).join('');
+        body += allDayEventList.map(eventInfo => `<div>${createHtmlForItem(eventInfo, date)}</div>`).join('');
     }
     return body;
 };
@@ -82,12 +84,18 @@ const createHtmlForMyGroupEventList = (myGroupEventList: MyGroupEvent[], date: D
 
     let body = `${title}`;
     body += regularEventList
-        .map(groupEvent => createHtmlForRegularEvent(groupEvent.eventInfo, date, groupEvent.participants))
-        .join('');
+        .map(groupEvent => {
+            if (isAlldayInRegularEvent(groupEvent.eventInfo)) {
+                return `<div>${createHtmlForItem(groupEvent.eventInfo, date, groupEvent.participants)}</div>`;
+            } else {
+                return createHtmlForItemWithTimeRange(groupEvent.eventInfo, date, groupEvent.participants);
+            }
+        }).join('');
+
     if (allDayEventList.length !== 0) {
         body += '<br><div>［終日予定］</div>';
         body += allDayEventList
-            .map(groupEvent => createHtmlForAllDayEvent(groupEvent.eventInfo, date, groupEvent.participants))
+            .map(groupEvent => `<div>${createHtmlForItem(groupEvent.eventInfo, date, groupEvent.participants)}</div>`)
             .join('');
     }
     return body;

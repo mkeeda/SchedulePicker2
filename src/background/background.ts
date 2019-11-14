@@ -1,6 +1,9 @@
 import { ScheduleEventType, ContextMenuIds, EventsType, StorageKeys } from './eventtype';
+import ScheduleEventsLogic from './scheduleeventslogic';
 import ScheduleEventsLogicImpl from './scheduleeventslogic';
 
+let previousDomain = '';
+let logic: ScheduleEventsLogic;
 const defaultMenuItems = [
     { id: ContextMenuIds.ROOT.toString(), title: 'SchedulePicker' },
     { id: ContextMenuIds.TODAY.toString(), title: '今日の予定', parentId: ContextMenuIds.ROOT },
@@ -23,14 +26,22 @@ const addMenu = (menu: any): void => {
     });
 };
 
-const setupContextMenu = async (domain: string): Promise<void> => {
-    const logic = new ScheduleEventsLogicImpl(domain);
-    const myGroups = await logic.getMyGroups();
-    const myGroupMenuItems = myGroups.map(g => {
-        return { id: g.key, title: g.name, parentId: ContextMenuIds.TODAY };
+const updateContextMenus = (): void => {
+    // FIXME 全部消すんじゃなくて、MyGroupのメニューだけを消すようにする popupからの更新
+    chrome.contextMenus.removeAll(async () => {
+        const myGroups = await logic.getMyGroups();
+        const myGroupMenuItems = myGroups.map(g => {
+            return { id: g.key, title: g.name, parentId: ContextMenuIds.MYGROUP, type: 'normal' };
+        });
+        const contextMenuItems = await createContextMenuItems(myGroupMenuItems);
+        contextMenuItems.forEach(item => {
+            addMenu(item);
+        });
     });
-    const contextMenuItems = await createContextMenuItems(myGroupMenuItems);
-    contextMenuItems.forEach(item => {
+};
+
+const setupContextMenus = async (): Promise<void> => {
+    defaultMenuItems.forEach(item => {
         addMenu(item);
     });
 
@@ -71,8 +82,14 @@ const setupContextMenu = async (domain: string): Promise<void> => {
 };
 
 chrome.runtime.onMessage.addListener((message, sender) => {
-    // FIXME 全部消すんじゃなくて、MyGroupのメニューだけを消すようにする
-    chrome.contextMenus.removeAll(() => {
-        setupContextMenu(message.domain);
-    });
+    if (message.domain === previousDomain) {
+        return;
+    } else {
+        logic = new ScheduleEventsLogicImpl(message.domain);
+        previousDomain = message.domain;
+    }
+});
+
+chrome.runtime.onInstalled.addListener(() => {
+    setupContextMenus();
 });

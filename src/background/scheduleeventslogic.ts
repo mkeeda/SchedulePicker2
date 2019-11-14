@@ -1,5 +1,5 @@
 import GaroonDataSource from './garoondatasource';
-import { ScheduleEventType } from './eventtype';
+import { DateType } from './eventtype';
 import * as base from 'garoon-soap/dist/type/base';
 import GaroonDataSourceImpl from './garoondatasource';
 import { EventInfo, Participant } from '../model/event';
@@ -7,10 +7,10 @@ import EventConverter from '../background/eventconverter';
 import * as util from './util';
 
 interface ScheduleEventsLogic {
-    getMyEvents(type: ScheduleEventType, targetType: string, target: string): Promise<EventInfo[]>;
-    getSortedMyEvents(type: ScheduleEventType, targetType: string, target: string): Promise<EventInfo[]>;
+    getMyEvents(type: DateType, targetType: string, target: string): Promise<EventInfo[]>;
+    getSortedMyEvents(type: DateType, targetType: string, target: string): Promise<EventInfo[]>;
     getMyGroups(): Promise<base.MyGroupType[]>;
-    getMyGroupSchedule(type: ScheduleEventType, groupId: string): Promise<any>;
+    getMyGroupSchedule(type: DateType, groupId: string): Promise<any>;
 }
 
 export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
@@ -20,7 +20,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         this.garoonDataSource = new GaroonDataSourceImpl(domain);
     }
 
-    private findDateFromType(type: ScheduleEventType): any {
+    private findDateFromType(type: DateType): any {
         // TODO: typeによる条件分岐を追加する
         const now = new Date();
         const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -28,7 +28,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         return { start: startDate, end: endDate };
     }
 
-    async getMyEvents(type: ScheduleEventType, targetType = '', target = ''): Promise<EventInfo[]> {
+    async getMyEvents(type: DateType, targetType = '', target = ''): Promise<EventInfo[]> {
         const date = this.findDateFromType(type);
         return await this.garoonDataSource.getScheduleEvents(
             date.start.toISOString(),
@@ -38,7 +38,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         );
     }
 
-    async getSortedMyEvents(type: ScheduleEventType, targetType = '', target = ''): Promise<EventInfo[]> {
+    async getSortedMyEvents(type: DateType, targetType = '', target = ''): Promise<EventInfo[]> {
         const eventInfoList = await this.getMyEvents(type);
         return eventInfoList.sort(util.sortByTimeFunc);
     }
@@ -50,7 +50,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         return this.garoonDataSource.getMyGroupsById(myGroupIds);
     }
 
-    async getMyGroupSchedule(type: ScheduleEventType, groupId: string): Promise<any> {
+    async getMyGroupSchedule(type: DateType, groupId: string): Promise<any> {
         const myGroups = await this.getMyGroups();
         const targetMyGroups = myGroups.filter(g => g.key === groupId);
 

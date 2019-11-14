@@ -1,4 +1,4 @@
-export enum ScheduleEventType {
+export enum DateType {
     TODAY,
     NEXT_BUSINESS_DAY,
     SECRET,

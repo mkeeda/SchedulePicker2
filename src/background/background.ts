@@ -153,6 +153,4 @@ chrome.runtime.onMessage.addListener((message, sender) => {
     }
 });
 
-chrome.runtime.onInstalled.addListener(() => {
-    setupContextMenus();
-});
+setupContextMenus();

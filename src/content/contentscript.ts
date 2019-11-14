@@ -23,10 +23,96 @@ const createHtmlForEvent = (eventInfo: EventInfo, date: Date, participants: Part
     `;
 };
 
+const createHtmlForRegularEvent = (eventInfo: EventInfo, date: Date, participants: Participant[] = []): string => {
+    const formattedDate = formatDate(date, 'yyyy-MM-dd');
+    const startTime = formatDate(new Date(eventInfo.startTime), 'HH:mm');
+    const endTime = formatDate(new Date(eventInfo.endTime), 'HH:mm');
+    return `
+    <div>
+        <span>${startTime}-${endTime}</span>
+        <a href="https://bozuman.cybozu.com/g/schedule/view.csp?event=${eventInfo.id}">${eventInfo.subject}</a>
+        ${participants
+            .map(
+                participant =>
+                    `<a style="color: chocolate;"
+                        href="https://bozuman.cybozu.com/g/schedule/personal_day.csp?bdate=${formattedDate}&uid=${
+                        participant.id
+                    }">${participant.name.split(' ')[0]}, </a>`
+            )
+            .join('')}
+    </div>
+    `;
+};
+
+const createHtmlForRepertingEvent = (eventInfo: EventInfo, date: Date, participants: Participant[] = []): string => {
+    const formattedDate = formatDate(date, 'yyyy-MM-dd');
+    const startTime = formatDate(new Date(eventInfo.startTime), 'HH:mm');
+    const endTime = formatDate(new Date(eventInfo.endTime), 'HH:mm');
+    return `
+    <div>
+        <span>${startTime}-${endTime}</span>
+        <a href="https://bozuman.cybozu.com/g/schedule/view.csp?event=${eventInfo.id}">${eventInfo.subject}</a>
+        ${participants
+            .map(
+                participant =>
+                    `<a style="color: chocolate;"
+                        href="https://bozuman.cybozu.com/g/schedule/personal_day.csp?bdate=${formattedDate}&uid=${
+                        participant.id
+                    }">${participant.name.split(' ')[0]}, </a>`
+            )
+            .join('')}
+    </div>
+    `;
+};
+
+const createHtmlForAllDayEvent = (eventInfo: EventInfo, date: Date, participants: Participant[] = []): string => {
+    const formattedDate = formatDate(date, 'yyyy-MM-dd');
+    return `
+    <div>
+        <a href="https://bozuman.cybozu.com/g/schedule/view.csp?event=${eventInfo.id}">${eventInfo.subject}</a>
+        ${participants
+            .map(
+                participant =>
+                    `<a style="color: chocolate;"
+                        href="https://bozuman.cybozu.com/g/schedule/personal_day.csp?bdate=${formattedDate}&uid=${
+                        participant.id
+                    }">${participant.name.split(' ')[0]}, </a>`
+            )
+            .join('')}
+    </div>
+    `;
+};
+
 const createHtmlForEventList = (eventInfoList: EventInfo[], date: Date): string => {
     const title = `<div>【 ${formatDate(date, 'yyyy-MM-dd')} の予定 】</div>`;
-    const body = eventInfoList.map(eventInfo => createHtmlForEvent(eventInfo, date)).join('');
-    return `${title}${body}`;
+    const regularEventList: EventInfo[] = [];
+    const repeatingEventList: EventInfo[] = []; // 繰り返し予定
+    const allDayEventList: EventInfo[] = []; // 終日予定
+
+    eventInfoList.forEach(eventInfo => {
+        if (eventInfo.eventType === 'REGULAR') {
+            regularEventList.push(eventInfo);
+        } else if (eventInfo.eventType === 'REPEATING') {
+            repeatingEventList.push(eventInfo);
+        } else if (eventInfo.eventType === 'ALL_DAY') {
+            allDayEventList.push(eventInfo);
+        } else {
+            console.log(eventInfo);
+        }
+    });
+
+    let body = `${title}`;
+    body += regularEventList.map(eventInfo => createHtmlForRegularEvent(eventInfo, date)).join('');
+    if (repeatingEventList.length !== 0) {
+        body += '<div>［繰り返し予定］</div>';
+        body += repeatingEventList.map(eventInfo => createHtmlForRepertingEvent(eventInfo, date)).join('');
+    }
+
+    if (allDayEventList.length !== 0) {
+        body += '<div>［終日予定］</div>';
+        body += allDayEventList.map(eventInfo => createHtmlForAllDayEvent(eventInfo, date)).join('');
+    }
+    return body;
 };
 
 const createHtmlForMyGroupEventList = (myGroupEventList: MyGroupEvent[], date: Date): string => {

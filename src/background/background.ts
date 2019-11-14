@@ -4,12 +4,31 @@ import ScheduleEventsLogicImpl from './scheduleeventslogic';
 
 let previousDomain = '';
 let logic: ScheduleEventsLogic;
+
 const defaultMenuItems = [
-    { id: ContextMenuIds.ROOT.toString(), title: 'SchedulePicker' },
-    { id: ContextMenuIds.TODAY.toString(), title: '今日の予定', parentId: ContextMenuIds.ROOT },
-    { id: ContextMenuIds.NEXT_BUSINESS_DAY.toString(), title: '翌営業日の予定', parentId: ContextMenuIds.ROOT },
-    { id: ContextMenuIds.TEMPLATE.toString(), title: 'テンプレート', parentId: ContextMenuIds.ROOT },
-    { id: ContextMenuIds.MYSELF.toString(), title: '自分', parentId: ContextMenuIds.TODAY },
+    { id: ContextMenuIds.ROOT.toString(), title: 'SchedulePicker', type: 'normal' },
+    { id: ContextMenuIds.TODAY.toString(), title: '今日', parentId: ContextMenuIds.ROOT, type: 'radio' },
+    {
+        id: ContextMenuIds.NEXT_BUSINESS_DAY.toString(),
+        title: '翌営業日',
+        parentId: ContextMenuIds.ROOT,
+        type: 'radio',
+    },
+    {
+        id: ContextMenuIds.PREVIOUS_BUSINESS_DAY.toString(),
+        title: '前営業日',
+        parentId: ContextMenuIds.ROOT,
+        type: 'radio',
+    },
+    { id: ContextMenuIds.MYSELF.toString(), title: '自分', parentId: ContextMenuIds.ROOT, type: 'normal' },
+    { id: ContextMenuIds.MYGROUP.toString(), title: 'MYグループ', parentId: ContextMenuIds.ROOT, type: 'normal' },
+    {
+        id: ContextMenuIds.MYGROUP_UPDATE.toString(),
+        title: '【 MYグループの更新 】',
+        parentId: ContextMenuIds.MYGROUP,
+        type: 'normal',
+    },
+    { id: ContextMenuIds.TEMPLATE.toString(), title: 'テンプレート', parentId: ContextMenuIds.ROOT, type: 'normal' },
 ];
 
 const createContextMenuItems = async (myGroupMenuItems): Promise<any> => {
@@ -21,8 +40,8 @@ const addMenu = (menu: any): void => {
         id: menu.id,
         title: menu.title,
         parentId: menu.parentId,
-        type: 'normal',
-        contexts: ['all'],
+        type: menu.type,
+        contexts: ['editable'],
     });
 };
 
@@ -60,6 +79,10 @@ const setupContextMenus = async (): Promise<void> => {
                     }
                     case ContextMenuIds.TEMPLATE: {
                         chrome.tabs.sendMessage(tab!.id!, ContextMenuIds.TEMPLATE);
+                        break;
+                    }
+                    case ContextMenuIds.MYGROUP_UPDATE: {
+                        updateContextMenus();
                         break;
                     }
                     default: {

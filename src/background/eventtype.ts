@@ -6,10 +6,14 @@ export enum ScheduleEventType {
 
 export enum ContextMenuIds {
     ROOT = 'root',
+    SELECT_DATE = 'select_date',
     TODAY = 'today',
     NEXT_BUSINESS_DAY = 'next_business_day',
-    TEMPLATE = 'template',
+    PREVIOUS_BUSINESS_DAY = 'previous_bisiness_day',
     MYSELF = 'myself',
+    MYGROUP = 'mygroup',
+    MYGROUP_UPDATE = 'mygroup_update',
+    TEMPLATE = 'template',
 }
 
 export enum EventsType {

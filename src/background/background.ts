@@ -139,6 +139,8 @@ const setupContextMenus = async (): Promise<void> => {
         chrome.storage.sync.get(
             [StorageKeys.IS_PRIVATE, StorageKeys.DATE, StorageKeys.TEMPLATE_TEXT, StorageKeys.DATE_TYPE],
             async items => {
+                // FIXME: radioボタンが選択されたときのイベントと、API接続系のイベントを１つのswitch文で分岐している設計がよろしくない
+                // FIXME: try/catchの範囲がでかすぎるので上記の対応をしたあとに適切な例外を投げる
                 try {
                     switch (info.menuItemId) {
                         case ContextMenuIds.MYSELF: {

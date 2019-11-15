@@ -10,7 +10,9 @@ export const formatDate = (date: Date, format): string => {
 };
 
 export const toDateFromString = (str: string): Date => {
-    if (str === '') {
+    // FIXME: items.date が undefined もしくは 空文字の場合はポップアップウインドウを出すようにした方がユーザーに親切
+    // 指定日が選択されていないときは今日の日付を出すようにしている。
+    if (str === '' || str == null) {
         return new Date();
     } else {
         return new Date(str);

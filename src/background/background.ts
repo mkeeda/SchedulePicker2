@@ -9,7 +9,7 @@ let previousDomain = '';
 let logic: ScheduleEventsLogic;
 
 const showPopupWindow = (): void => {
-    window.open('../popup.html', 'extension_popup', 'width=500,height=580,status=no,scrollbars=yes,resizable=no');
+    window.open('../calendar.html', 'extension_calendar', 'width=240,height=100,status=no');
 };
 
 const defaultMenuItems = [

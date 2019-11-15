@@ -16,7 +16,7 @@ interface ScheduleEventsLogic {
     ): Promise<EventInfo[]>;
     getMyGroups(): Promise<base.MyGroupType[]>;
     getMyGroupEvents(dateRange: DateRange, isPrivate: boolean, groupId: string): Promise<MyGroupEvent[]>;
-    getNarrowedDownPublicHolidays(specificDate: Date): Promise<Date[]>;
+    getNarrowedDownPublicHolidays(specificDate: Date): Promise<string[]>;
 }
 
 export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
@@ -115,7 +115,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         return myGroupEventList;
     }
 
-    async getNarrowedDownPublicHolidays(specificDate: Date): Promise<Date[]> {
+    async getNarrowedDownPublicHolidays(specificDate: Date): Promise<string[]> {
         const calendarEvents = await this.garoonDataSource.getCalendarEvents();
         return calendarEvents
             .filter(event => {
@@ -138,6 +138,6 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
                     holiday.getTime() > oneMonthBefore.getTime()
                 );
             })
-            .map(event => new Date(event.date));
+            .map(event => new Date(event.date).toLocaleDateString());
     }
 }

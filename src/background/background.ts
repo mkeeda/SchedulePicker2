@@ -77,17 +77,18 @@ const makeDataRange = (date: Date): DateRange => {
 const getIncrementDay = (specificDate: Date, increment: number): Date =>
     new Date(specificDate.getFullYear(), specificDate.getMonth(), specificDate.getDate() + increment);
 
-const getBusinessDate = (specificDate: Date, publicHolidays: Date[], increment: number): Date => {
+const getBusinessDate = (specificDate: Date, publicHolidays: string[], increment: number): Date => {
     const incrementDate = getIncrementDay(specificDate, increment);
     const day = moment.weekdays(incrementDate.getDay());
-    if (day === 'Saturday' || day === 'Sunday' || publicHolidays.indexOf(incrementDate) >= 0) {
+    const incrementDateStr = incrementDate.toLocaleDateString();
+    if (day === 'Saturday' || day === 'Sunday' || publicHolidays.indexOf(incrementDateStr) >= 0) {
         return getBusinessDate(incrementDate, publicHolidays, increment);
     } else {
         return incrementDate;
     }
 };
 
-const findDateRangeFromType = (type: DateType, selectedDate: Date, publicHolidays: Date[]): DateRange => {
+const findDateRangeFromType = (type: DateType, selectedDate: Date, publicHolidays: string[]): DateRange => {
     switch (type) {
         case DateType.TODAY: {
             return makeDataRange(new Date());

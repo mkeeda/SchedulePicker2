@@ -10,7 +10,7 @@ export const formatDate = (date: Date, format): string => {
 };
 
 export const toDateFromString = (str: string): Date => {
-    if (str === '') {
+    if (str === '' && str == null) {
         return new Date();
     } else {
         return new Date(str);

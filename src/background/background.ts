@@ -8,7 +8,7 @@ import * as moment from 'moment';
 let previousDomain = '';
 let logic: ScheduleEventsLogic;
 
-const showPopupWindow = (): void => {
+const showSelectCalendarWindow = (): void => {
     window.open('../calendar.html', 'extension_calendar', 'width=300, height=100, status=no');
 };
 
@@ -130,6 +130,16 @@ const updateContextMenus = (): void => {
     });
 };
 
+// FIXME 下のswitch文をリファクタすると対応して〜！
+const showCalendarWindowIfInvalidSelectCombination = (menuItemId: string, items: any): boolean => {
+    if (menuItemId == ContextMenuIds.SELECT_DATE || ContextMenuIds.MYSELF || ContextMenuIds.TEMPLATE) {
+        if (items.dateType === DateType.SELECT_DAY && items.date == null) {
+            return true;
+        }
+    }
+    return false;
+};
+
 const setupContextMenus = async (): Promise<void> => {
     defaultMenuItems.forEach(item => {
         addMenu(item);
@@ -139,7 +149,12 @@ const setupContextMenus = async (): Promise<void> => {
         chrome.storage.sync.get(
             [StorageKeys.IS_PRIVATE, StorageKeys.DATE, StorageKeys.TEMPLATE_TEXT, StorageKeys.DATE_TYPE],
             async items => {
+                // FIXME switch文をもっといい感じに！
                 try {
+                    if (showCalendarWindowIfInvalidSelectCombination(info.menuItemId, items)) {
+                        showSelectCalendarWindow();
+                        return;
+                    }
                     switch (info.menuItemId) {
                         case ContextMenuIds.MYSELF: {
                             chrome.tabs.sendMessage(tab!.id!, { eventType: EventsType.NOW_LOADING });
@@ -192,7 +207,7 @@ const setupContextMenus = async (): Promise<void> => {
                         }
                         case ContextMenuIds.SELECT_DATE: {
                             chrome.storage.sync.set({ dateType: DateType.SELECT_DAY });
-                            showPopupWindow();
+                            showSelectCalendarWindow();
                             break;
                         }
                         default: {

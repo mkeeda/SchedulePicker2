@@ -16,7 +16,7 @@ interface ScheduleEventsLogic {
     ): Promise<EventInfo[]>;
     getMyGroups(): Promise<base.MyGroupType[]>;
     getMyGroupEvents(dateRange: DateRange, isPrivate: boolean, groupId: string): Promise<MyGroupEvent[]>;
-    getNarrowedDownPublicHolidays(specificYear: number): Promise<Date[]>;
+    getNarrowedDownPublicHolidays(specificDate: Date): Promise<Date[]>;
 }
 
 export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
@@ -115,17 +115,27 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         return myGroupEventList;
     }
 
-    async getNarrowedDownPublicHolidays(specificYear: number): Promise<Date[]> {
+    async getNarrowedDownPublicHolidays(specificDate: Date): Promise<Date[]> {
         const calendarEvents = await this.garoonDataSource.getCalendarEvents();
         return calendarEvents
             .filter(event => {
-                const year = event.date.toString().split('-')[0];
-                // リストのサイズが大きすぎるので、指定した年の１年前後の祝日のリストに絞り込む
+                const holiday = new Date(event.date);
+
+                const oneMonthBefore = new Date(
+                    specificDate.getFullYear(),
+                    specificDate.getMonth() - 1,
+                    specificDate.getDate()
+                );
+                const oneMonthLater = new Date(
+                    specificDate.getFullYear(),
+                    specificDate.getMonth() + 1,
+                    specificDate.getDate()
+                );
+                // リストのサイズが大きすぎるので、指定した日からの1ヶ月前後の祝日のリストに絞り込む
                 return (
                     event.type === 'public_holiday' &&
-                    (String(specificYear - 1) === year ||
-                        String(specificYear) === year ||
-                        String(specificYear + 1) === year)
+                    oneMonthLater.getTime() > holiday.getTime() &&
+                    holiday.getTime() > oneMonthBefore.getTime()
                 );
             })
             .map(event => new Date(event.date));

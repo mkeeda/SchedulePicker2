@@ -2,6 +2,8 @@ import { DateType, ContextMenuIds, EventsType, StorageKeys } from './eventtype';
 import ScheduleEventsLogic from './scheduleeventslogic';
 import ScheduleEventsLogicImpl from './scheduleeventslogic';
 import { DateRange } from '../types/date';
+import { toDateFromString, formatDate } from './dateutil';
+import * as moment from 'moment';
 
 let previousDomain = '';
 let logic: ScheduleEventsLogic;
@@ -72,24 +74,31 @@ const makeDataRange = (date: Date): DateRange => {
     return { startDate: startDate, endDate: endDate };
 };
 
-const findDateRangeFromType = (type: DateType, selectedDateStr: string): DateRange => {
+const getIncrementDay = (specificDate: Date, increment: number): Date =>
+    new Date(specificDate.getFullYear(), specificDate.getMonth(), specificDate.getDate() + increment);
+
+const getBusinessDate = (specificDate: Date, publicHolidays: Date[], increment: number): Date => {
+    const incrementDate = getIncrementDay(specificDate, increment);
+    const day = moment.weekdays(incrementDate.getDay());
+    if (day === 'Saturday' || day === 'Sunday' || publicHolidays.indexOf(incrementDate) >= 0) {
+        return getBusinessDate(incrementDate, publicHolidays, increment);
+    } else {
+        return incrementDate;
+    }
+};
+
+const findDateRangeFromType = (type: DateType, selectedDate: Date, publicHolidays: Date[]): DateRange => {
     switch (type) {
         case DateType.TODAY: {
             return makeDataRange(new Date());
         }
-        case DateType.NEXT_BUSINESS_DAY:
-            // TODO: 翌営業日を返す
-            return { startDate: new Date(), endDate: new Date() };
-        case DateType.PREVIOUS_BUSINESS_DAY:
-            // TODO: 前営業日を返す
-            return { startDate: new Date(), endDate: new Date() };
-        case DateType.SELECT_DAY: {
-            if (selectedDateStr === '') {
-                return makeDataRange(new Date());
-            } else {
-                return makeDataRange(new Date(selectedDateStr));
-            }
+        case DateType.NEXT_BUSINESS_DAY: {
+            return makeDataRange(getBusinessDate(new Date(), publicHolidays, 1));
         }
+        case DateType.PREVIOUS_BUSINESS_DAY:
+            return makeDataRange(getBusinessDate(new Date(), publicHolidays, -1));
+        case DateType.SELECT_DAY:
+            return makeDataRange(selectedDate);
         default: {
             throw new Error('DateTypeが存在しません');
         }
@@ -133,8 +142,12 @@ const setupContextMenus = async (): Promise<void> => {
                     switch (info.menuItemId) {
                         case ContextMenuIds.MYSELF: {
                             chrome.tabs.sendMessage(tab!.id!, { eventType: EventsType.NOW_LOADING });
-                            const dateRange = findDateRangeFromType(items.dateType, items.date);
                             const publicHolidays = await logic.getNarrowedDownPublicHolidays(new Date());
+                            const dateRange = findDateRangeFromType(
+                                items.dateType,
+                                toDateFromString(items.date),
+                                publicHolidays
+                            );
                             const eventInfoList = await logic.getSortedMyEvents(dateRange, items.isPrivate);
                             chrome.tabs.sendMessage(tab!.id!, {
                                 eventType: EventsType.MY_EVENTS,
@@ -145,8 +158,12 @@ const setupContextMenus = async (): Promise<void> => {
                         }
                         case ContextMenuIds.TEMPLATE: {
                             chrome.tabs.sendMessage(tab!.id!, { eventType: EventsType.NOW_LOADING });
-                            const dateRange = findDateRangeFromType(DateType.TODAY, items.date);
                             const publicHolidays = await logic.getNarrowedDownPublicHolidays(new Date());
+                            const dateRange = findDateRangeFromType(
+                                DateType.TODAY,
+                                toDateFromString(items.date),
+                                publicHolidays
+                            );
                             const eventInfoList = await logic.getSortedMyEvents(dateRange, items.isPrivate);
                             chrome.tabs.sendMessage(tab!.id!, {
                                 eventType: EventsType.TEMPLATE,
@@ -179,8 +196,12 @@ const setupContextMenus = async (): Promise<void> => {
                         }
                         default: {
                             chrome.tabs.sendMessage(tab!.id!, { eventType: EventsType.NOW_LOADING });
-                            const dateRange = findDateRangeFromType(items.dateType, items.date);
                             const publicHolidays = await logic.getNarrowedDownPublicHolidays(new Date());
+                            const dateRange = findDateRangeFromType(
+                                items.dateType,
+                                toDateFromString(items.date),
+                                publicHolidays
+                            );
                             const myGroupEventList = await logic.getMyGroupEvents(
                                 dateRange,
                                 items.isPrivate,

@@ -8,3 +8,11 @@ export const formatDate = (date: Date, format): string => {
     format = format.replace(/SSS/g, ('00' + date.getMilliseconds()).slice(-3));
     return format;
 };
+
+export const toDateFromString = (str: string): Date => {
+    if (str === '') {
+        return new Date();
+    } else {
+        return new Date(str);
+    }
+};

@@ -3,7 +3,6 @@ import * as base from 'garoon-soap/dist/type/base';
 import GaroonDataSourceImpl from './garoondatasource';
 import { EventInfo, Participant, MyGroupEvent } from '../types/event';
 import EventConverter from '../background/eventconverter';
-import * as util from './util';
 import { DateRange } from '../types/date';
 
 interface ScheduleEventsLogic {
@@ -29,6 +28,10 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
 
     constructor(domain: string) {
         this.garoonDataSource = new GaroonDataSourceImpl(domain);
+    }
+
+    private sortByTimeFunc(eventInfo: EventInfo, nextEventInfo: EventInfo): number {
+        return eventInfo.startTime.getTime() > nextEventInfo.startTime.getTime() ? 1 : -1;
     }
 
     async getMyEvents(
@@ -61,7 +64,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         target = ''
     ): Promise<EventInfo[]> {
         const eventInfoList = await this.getMyEvents(dateRange, isIncludePrivateEvent, targetType, target);
-        return eventInfoList.sort(util.sortByTimeFunc);
+        return eventInfoList.sort(this.sortByTimeFunc);
     }
 
     // TODO: 型定義ファイルを作る
@@ -114,7 +117,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
                 }
                 return uniqueEvents;
             }, [])
-            .sort(util.sortByTimeFunc)
+            .sort(this.sortByTimeFunc)
             .map(eventInfo => {
                 const participantList: Participant[] = [];
                 eventInfo.attendees.forEach((participant: Participant) => {

@@ -23,6 +23,13 @@ export interface MyGroupEvent {
     participants: Participant[];
 }
 
+export interface TemplateEvent {
+    todayEventInfoList: EventInfo[];
+    nextDayEventInfoList: EventInfo[];
+    previousDayEventInfoList: EventInfo[];
+    indexes: SpecialTemplateCharactorIndexs;
+}
+
 export interface RecieveEventMessage {
     eventType: EventsType;
     dateStr: string;
@@ -34,4 +41,10 @@ export interface EventMenuColor {
     r: number;
     g: number;
     b: number;
+}
+
+export interface SpecialTemplateCharactorIndexs {
+    todayIndexes: number[];
+    nextDayIndexes: number[];
+    previousDayIndexes: number[];
 }

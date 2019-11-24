@@ -1,5 +1,5 @@
-import { EventsType } from '../background/eventtype';
-import { EventInfo, Participant, RecieveEventMessage, MyGroupEvent } from '../types/event';
+import { EventsType, SpecialTemplateCharactor } from '../background/eventtype';
+import { EventInfo, Participant, RecieveEventMessage, MyGroupEvent, TemplateEvent } from '../types/event';
 import { formatDate } from '../background/dateutil';
 import { eventMenuColor } from './eventmenucolor';
 
@@ -61,7 +61,23 @@ const createHtmlForAllDayEvent = (eventInfo: EventInfo): string => {
     return `<div>${body}</div>`;
 };
 
-const createHtmlForRegularEvent = (eventInfo: EventInfo, date: Date, participants: Participant[] = []): string => {
+const createHtmlForRegularEvent = (eventInfo: EventInfo): string => {
+    let body = '';
+    body += createHtmlForTimeRange(eventInfo);
+
+    if (eventInfo.eventMenu !== '') {
+        body += ` ${createEventMenu(eventInfo.eventMenu)}`; // スペース1つ分の余白を付けてデザインの微調整
+    }
+    body += ` ${createHtmlForEventName(eventInfo)}`; // スペース1つ分の余白を付けてデザインの微調整
+
+    return `<div>${body}</div>`;
+};
+
+const createHtmlForRegularEventIncludeParticipant = (
+    eventInfo: EventInfo,
+    date: Date,
+    participants: Participant[] = []
+): string => {
     let body = '';
     body += createHtmlForTimeRange(eventInfo);
 
@@ -76,7 +92,7 @@ const createHtmlForRegularEvent = (eventInfo: EventInfo, date: Date, participant
     return `<div>${body}</div>`;
 };
 
-const createHtmlForEventList = (eventInfoList: EventInfo[], date: Date): string => {
+const createHtmlForEventList = (eventInfoList: EventInfo[]): string => {
     const regularEventList: EventInfo[] = [];
     const allDayEventList: EventInfo[] = [];
 
@@ -94,7 +110,7 @@ const createHtmlForEventList = (eventInfoList: EventInfo[], date: Date): string 
             if (isAlldayInRegularEvent(eventInfo)) {
                 return createHtmlForAllDayEvent(eventInfo);
             } else {
-                return createHtmlForRegularEvent(eventInfo, date);
+                return createHtmlForRegularEvent(eventInfo);
             }
         })
         .join('');
@@ -124,7 +140,7 @@ const createHtmlForMyGroupEventList = (myGroupEventList: MyGroupEvent[], date: D
             if (isAlldayInRegularEvent(groupEvent.eventInfo)) {
                 return createHtmlForAllDayEvent(groupEvent.eventInfo);
             } else {
-                return createHtmlForRegularEvent(groupEvent.eventInfo, date, groupEvent.participants);
+                return createHtmlForRegularEventIncludeParticipant(groupEvent.eventInfo, date, groupEvent.participants);
             }
         })
         .join('');
@@ -134,6 +150,11 @@ const createHtmlForMyGroupEventList = (myGroupEventList: MyGroupEvent[], date: D
         body += allDayEventList.map(groupEvent => createHtmlForAllDayEvent(groupEvent.eventInfo)).join('');
     }
     return `${body}<div></div>`; // 挿入位置の下に文字列が入力されている時、入力されている文字列が予定の末尾にマージされてしまうので、div要素を無理矢理差し込んで改行する
+};
+
+const escapeRegExp = (text): string => {
+    // eslint-disable-next-line no-useless-escape
+    return text.replace(/[.*+?^=!:${}()|[\]\/\\]/g, '\\$&'); // $&はマッチした部分文字列全体を意味する
 };
 
 chrome.runtime.sendMessage({ domain: document.domain });
@@ -156,7 +177,7 @@ chrome.runtime.onMessage.addListener((message: RecieveEventMessage) => {
     if (message.eventType === EventsType.MY_EVENTS) {
         const date = new Date(message.dateStr);
         const title = createHtmlScheduleTitle(date);
-        const body = createHtmlForEventList(message.events, date);
+        const body = createHtmlForEventList(message.events);
         const html = title + body;
         document.execCommand('insertHtml', false, html);
     }
@@ -170,8 +191,27 @@ chrome.runtime.onMessage.addListener((message: RecieveEventMessage) => {
     }
 
     if (message.eventType === EventsType.TEMPLATE) {
-        // TODO: テンプレートの解析処理を挟む
-        document.execCommand('insertText', false, message.templateText);
+        const templateEvent: TemplateEvent = message.events;
+        let templateText = message.templateText;
+
+        if (templateEvent.todayEventInfoList.length !== 0) {
+            const html = createHtmlForEventList(templateEvent.todayEventInfoList);
+            const regex = new RegExp(escapeRegExp(SpecialTemplateCharactor.TODAY), 'g');
+            templateText = templateText.replace(regex, html);
+        }
+
+        if (templateEvent.nextDayEventInfoList.length !== 0) {
+            const html = createHtmlForEventList(templateEvent.nextDayEventInfoList);
+            const regex = new RegExp(escapeRegExp(SpecialTemplateCharactor.NEXT_BUSINESS_DAY), 'g');
+            templateText = templateText.replace(regex, html);
+        }
+
+        if (templateEvent.previousDayEventInfoList.length !== 0) {
+            const html = createHtmlForEventList(templateEvent.previousDayEventInfoList);
+            const regex = new RegExp(escapeRegExp(SpecialTemplateCharactor.PREVIOUS_BUSINESS_DAY), 'g');
+            templateText = templateText.replace(regex, html);
+        }
+        document.execCommand('insertHTML', false, templateText);
     }
     document.body.style.cursor = 'auto';
 });

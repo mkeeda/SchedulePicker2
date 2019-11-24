@@ -4,6 +4,7 @@ import ScheduleEventsLogicImpl from './scheduleeventslogic';
 import { DateRange } from '../types/date';
 import { toDateFromString, formatDate } from './dateutil';
 import * as moment from 'moment';
+import { TemplateEvent } from 'src/types/event';
 
 let previousDomain = '';
 let logic: ScheduleEventsLogic;
@@ -170,22 +171,63 @@ const setupContextMenus = async (): Promise<void> => {
                             break;
                         }
                         case ContextMenuIds.TEMPLATE: {
+                            // FIXME: 長過ぎるので仕様を書くService層を追加してコードをコンパクトにする
                             chrome.tabs.sendMessage(tab!.id!, { eventType: EventsType.NOW_LOADING });
                             const publicHolidays = await logic.getNarrowedDownPublicHolidays(new Date());
-                            const dateRange = findDateRangeFromType(
-                                DateType.TODAY,
-                                toDateFromString(items.date),
-                                publicHolidays
-                            );
-                            const eventInfoList = await logic.getSortedMyEvents(
-                                dateRange,
-                                items.isIncludePrivateEvent,
-                                items.isIncludeAllDayEvent
-                            );
+                            const indexes = logic.getIndexesSpecialTemplateCharactor(items.templateText);
+                            const templateEvent: TemplateEvent = {
+                                todayEventInfoList: [],
+                                nextDayEventInfoList: [],
+                                previousDayEventInfoList: [],
+                                indexes: indexes,
+                            };
+
+                            if (indexes.todayIndexes.length !== 0) {
+                                const dateRange = findDateRangeFromType(
+                                    DateType.TODAY,
+                                    toDateFromString(items.date),
+                                    publicHolidays
+                                );
+                                const eventInfoList = await logic.getSortedMyEvents(
+                                    dateRange,
+                                    items.isIncludePrivateEvent,
+                                    items.isIncludeAllDayEvent
+                                );
+                                templateEvent.todayEventInfoList = eventInfoList;
+                            }
+
+                            if (indexes.nextDayIndexes.length !== 0) {
+                                const dateRange = findDateRangeFromType(
+                                    DateType.NEXT_BUSINESS_DAY,
+                                    toDateFromString(items.date),
+                                    publicHolidays
+                                );
+                                const eventInfoList = await logic.getSortedMyEvents(
+                                    dateRange,
+                                    items.isIncludePrivateEvent,
+                                    items.isIncludeAllDayEvent
+                                );
+                                templateEvent.nextDayEventInfoList = eventInfoList;
+                            }
+
+                            if (indexes.previousDayIndexes.length !== 0) {
+                                const dateRange = findDateRangeFromType(
+                                    DateType.PREVIOUS_BUSINESS_DAY,
+                                    toDateFromString(items.date),
+                                    publicHolidays
+                                );
+                                const eventInfoList = await logic.getSortedMyEvents(
+                                    dateRange,
+                                    items.isIncludePrivateEvent,
+                                    items.isIncludeAllDayEvent
+                                );
+                                templateEvent.previousDayEventInfoList = eventInfoList;
+                            }
+
                             chrome.tabs.sendMessage(tab!.id!, {
                                 eventType: EventsType.TEMPLATE,
-                                dateStr: dateRange.startDate.toString(),
-                                events: eventInfoList,
+                                dateStr: null,
+                                events: templateEvent,
                                 templateText: items.templateText,
                             });
                             break;

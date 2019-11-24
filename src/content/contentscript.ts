@@ -9,6 +9,10 @@ const isAlldayInRegularEvent = (eventInfo: EventInfo): boolean => {
     return startTime === '00:00' && endTime === '23:59';
 };
 
+const createHtmlScheduleTitle = (date: Date): string => {
+    return `<div>【 ${formatDate(date, 'yyyy-MM-dd')} の予定 】</div>`;
+};
+
 const createEventMenu = (planName: string): string => {
     const rgb = eventMenuColor(planName);
     return `<span 
@@ -73,7 +77,6 @@ const createHtmlForRegularEvent = (eventInfo: EventInfo, date: Date, participant
 };
 
 const createHtmlForEventList = (eventInfoList: EventInfo[], date: Date): string => {
-    const title = `<div>【 ${formatDate(date, 'yyyy-MM-dd')} の予定 】</div>`;
     const regularEventList: EventInfo[] = [];
     const allDayEventList: EventInfo[] = [];
 
@@ -85,7 +88,7 @@ const createHtmlForEventList = (eventInfoList: EventInfo[], date: Date): string 
         }
     });
 
-    let body = `${title}`;
+    let body = '';
     body += regularEventList
         .map(eventInfo => {
             if (isAlldayInRegularEvent(eventInfo)) {
@@ -104,7 +107,6 @@ const createHtmlForEventList = (eventInfoList: EventInfo[], date: Date): string 
 };
 
 const createHtmlForMyGroupEventList = (myGroupEventList: MyGroupEvent[], date: Date): string => {
-    const title = `<div>【 ${formatDate(date, 'yyyy-MM-dd')} の予定 】</div>`;
     const regularEventList: MyGroupEvent[] = [];
     const allDayEventList: MyGroupEvent[] = [];
 
@@ -116,7 +118,7 @@ const createHtmlForMyGroupEventList = (myGroupEventList: MyGroupEvent[], date: D
         }
     });
 
-    let body = `${title}`;
+    let body = '';
     body += regularEventList
         .map(groupEvent => {
             if (isAlldayInRegularEvent(groupEvent.eventInfo)) {
@@ -152,12 +154,18 @@ chrome.runtime.onMessage.addListener((message: RecieveEventMessage) => {
     }
 
     if (message.eventType === EventsType.MY_EVENTS) {
-        const html = createHtmlForEventList(message.events, new Date(message.dateStr));
+        const date = new Date(message.dateStr);
+        const title = createHtmlScheduleTitle(date);
+        const body = createHtmlForEventList(message.events, date);
+        const html = title + body;
         document.execCommand('insertHtml', false, html);
     }
 
     if (message.eventType === EventsType.MY_GROUP_EVENTS) {
-        const html = createHtmlForMyGroupEventList(message.events, new Date(message.dateStr));
+        const date = new Date(message.dateStr);
+        const title = createHtmlScheduleTitle(date);
+        const body = createHtmlForMyGroupEventList(message.events, date);
+        const html = title + body;
         document.execCommand('insertHtml', false, html);
     }
 

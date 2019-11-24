@@ -100,7 +100,7 @@ const createHtmlForEventList = (eventInfoList: EventInfo[], date: Date): string 
         body += '<br><div>［終日予定］</div>';
         body += allDayEventList.map(eventInfo => createHtmlForAllDayEvent(eventInfo)).join('');
     }
-    return body;
+    return `${body}<div></div>`; // 挿入位置の下に文字列が入力されている時、入力されている文字列が予定の末尾にマージされてしまうので、div要素を無理矢理差し込んで改行する
 };
 
 const createHtmlForMyGroupEventList = (myGroupEventList: MyGroupEvent[], date: Date): string => {
@@ -131,7 +131,7 @@ const createHtmlForMyGroupEventList = (myGroupEventList: MyGroupEvent[], date: D
         body += '<br><div>［終日予定］</div>';
         body += allDayEventList.map(groupEvent => createHtmlForAllDayEvent(groupEvent.eventInfo)).join('');
     }
-    return body;
+    return `${body}<div></div>`; // 挿入位置の下に文字列が入力されている時、入力されている文字列が予定の末尾にマージされてしまうので、div要素を無理矢理差し込んで改行する
 };
 
 chrome.runtime.sendMessage({ domain: document.domain });

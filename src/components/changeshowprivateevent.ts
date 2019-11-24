@@ -1,7 +1,7 @@
 import { LitElement, html, css, property, customElement, TemplateResult } from 'lit-element';
 
-@customElement('private-schedule')
-export class PrivateSchedule extends LitElement {
+@customElement('change-show-private-event')
+export class ChangeShowPrivateEventg extends LitElement {
     @property({ type: Boolean })
     isIncludePrivateEvent = false;
 

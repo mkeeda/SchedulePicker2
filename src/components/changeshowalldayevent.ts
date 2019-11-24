@@ -1,7 +1,7 @@
 import { LitElement, html, css, property, customElement, TemplateResult } from 'lit-element';
 
-@customElement('change-show-private-event')
-export class ChangeShowPrivateEvent extends LitElement {
+@customElement('change-show-all-day-event')
+export class ChangeShowAllDayEvent extends LitElement {
     @property({ type: Boolean })
     isIncludeEvent = false;
 
@@ -13,7 +13,7 @@ export class ChangeShowPrivateEvent extends LitElement {
     render(): TemplateResult {
         return html`
             <div>
-                <span>非公開予定を含む：</span>
+                <span>終日予定を含む：</span>
                 <input
                     class="checkbox"
                     type="checkbox"

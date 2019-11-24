@@ -9,17 +9,24 @@ interface ScheduleEventsLogic {
     getMyEvents(
         dateRange: DateRange,
         isIncludePrivateEvent: boolean,
+        isIncludeAllDayEvent: boolean,
         targetType: string,
         target: string
     ): Promise<EventInfo[]>;
     getSortedMyEvents(
         dateRange: DateRange,
         isIncludePrivateEvent: boolean,
+        isIncludeAllDayEvent: boolean,
         targetType: string,
         target: string
     ): Promise<EventInfo[]>;
     getMyGroups(): Promise<base.MyGroupType[]>;
-    getMyGroupEvents(dateRange: DateRange, isIncludePrivateEvent: boolean, groupId: string): Promise<MyGroupEvent[]>;
+    getMyGroupEvents(
+        dateRange: DateRange,
+        isIncludePrivateEvent: boolean,
+        isIncludeAllDayEvent: boolean,
+        groupId: string
+    ): Promise<MyGroupEvent[]>;
     getNarrowedDownPublicHolidays(specificDate: Date): Promise<string[]>;
 }
 
@@ -37,6 +44,8 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
     async getMyEvents(
         dateRange: DateRange,
         isIncludePrivateEvent: boolean,
+        isIncludeAllDayEvent: boolean,
+
         targetType = '',
         target = ''
     ): Promise<EventInfo[]> {
@@ -53,6 +62,10 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
                 isIncludeEvent = event.visibilityType !== 'PRIVATE';
             }
 
+            if (!isIncludeAllDayEvent) {
+                isIncludeEvent = !event.isAllDay;
+            }
+
             return isIncludeEvent;
         });
     }
@@ -60,10 +73,17 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
     async getSortedMyEvents(
         dateRange: DateRange,
         isIncludePrivateEvent: boolean,
+        isIncludeAllDayEvent: boolean,
         targetType = '',
         target = ''
     ): Promise<EventInfo[]> {
-        const eventInfoList = await this.getMyEvents(dateRange, isIncludePrivateEvent, targetType, target);
+        const eventInfoList = await this.getMyEvents(
+            dateRange,
+            isIncludePrivateEvent,
+            isIncludeAllDayEvent,
+            targetType,
+            target
+        );
         return eventInfoList.sort(this.sortByTimeFunc);
     }
 
@@ -77,6 +97,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
     async getMyGroupEvents(
         dateRange: DateRange,
         isIncludePrivateEvent: boolean,
+        isIncludeAllDayEvent: boolean,
         groupId: string
     ): Promise<MyGroupEvent[]> {
         const myGroups = await this.getMyGroups();
@@ -97,7 +118,13 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         */
         const eventInfoPerUserList = await Promise.all(
             groupMemberList.map(async userId => {
-                const eventInfoList = await this.getMyEvents(dateRange, isIncludePrivateEvent, 'user', userId);
+                const eventInfoList = await this.getMyEvents(
+                    dateRange,
+                    isIncludePrivateEvent,
+                    isIncludeAllDayEvent,
+                    'user',
+                    userId
+                );
                 return eventInfoList;
             })
         );

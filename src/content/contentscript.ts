@@ -11,54 +11,77 @@ const isAlldayInRegularEvent = (eventInfo: EventInfo): boolean => {
 
 const createEventMenu = (planName: string): string => {
     const rgb = eventMenuColor(planName);
-    return `<span style="background-color: rgb(${rgb.r}, ${rgb.g}, ${rgb.b}); display: inline-block; margin-right: 3px; padding: 2px 2px 1px; color: rgb(255, 255, 255); font-size: 11.628px; border-radius: 2px; line-height: 1.1;">${planName}</span>`;
+    return `<span 
+                style="background-color: rgb(${rgb.r}, ${rgb.g}, ${rgb.b}); 
+                display: inline-block; 
+                margin-right: 3px; 
+                padding: 2px 2px 1px; 
+                color: rgb(255, 255, 255); 
+                font-size: 11.628px; 
+                border-radius: 2px; 
+                line-height: 1.1;"
+            >${planName}</span>`;
 };
 
-const createHtmlForItem = (eventInfo: EventInfo, date: Date, participants: Participant[] = []): string => {
+const createHtmlForTimeRange = (eventInfo: EventInfo): string => {
+    const startTime = formatDate(new Date(eventInfo.startTime), 'HH:mm');
+    const endTime = formatDate(new Date(eventInfo.endTime), 'HH:mm');
+    return `<span>${startTime}-${endTime}</span>`;
+};
+
+const createHtmlForEventName = (eventInfo: EventInfo): string => {
+    return `<a href="https://bozuman.cybozu.com/g/schedule/view.csp?event=${eventInfo.id}">${eventInfo.subject}</a>`;
+};
+
+const createHtmlForEventParticipant = (date: Date, participants: Participant[]): string => {
     const formattedDate = formatDate(date, 'yyyy-MM-dd');
+    return `
+        ${participants
+            .map(
+                participant =>
+                    `<a style="color: chocolate;" 
+                        href="https://bozuman.cybozu.com/g/schedule/personal_day.csp?bdate=${formattedDate}&uid=${
+                        participant.id
+                    }"> (${participant.name.split(' ')[0]}) </a>`
+            )
+            .join('')}`;
+};
+
+const createHtmlForAllDayEvent = (eventInfo: EventInfo): string => {
     let body = '';
     if (eventInfo.eventMenu !== '') {
         body += createEventMenu(eventInfo.eventMenu);
     }
 
-    body += `
-        <a href="https://bozuman.cybozu.com/g/schedule/view.csp?event=${eventInfo.id}">${eventInfo.subject}</a>
-        ${participants
-            .map(
-                participant =>
-                    `<a style="color: chocolate;"
-                        href="https://bozuman.cybozu.com/g/schedule/personal_day.csp?bdate=${formattedDate}&uid=${
-                        participant.id
-                    }">${participant.name.split(' ')[0]}, </a>`
-            )
-            .join('')}
-    `;
-    return body;
+    body += ` ${createHtmlForEventName(eventInfo)}`; // スペース1つ分の余白を付けてデザインの微調整
+    return `<div>${body}</div>`;
 };
 
-const createHtmlForItemWithTimeRange = (eventInfo: EventInfo, date: Date, participants: Participant[] = []): string => {
-    const startTime = formatDate(new Date(eventInfo.startTime), 'HH:mm');
-    const endTime = formatDate(new Date(eventInfo.endTime), 'HH:mm');
-    return `
-    <div>
-        <span>${startTime}-${endTime}</span>
-        ${createHtmlForItem(eventInfo, date, participants)}
-    </div>
-    `;
+const createHtmlForRegularEvent = (eventInfo: EventInfo, date: Date, participants: Participant[] = []): string => {
+    let body = '';
+    body += createHtmlForTimeRange(eventInfo);
+
+    if (eventInfo.eventMenu !== '') {
+        body += ` ${createEventMenu(eventInfo.eventMenu)}`; // スペース1つ分の余白を付けてデザインの微調整
+    }
+    body += ` ${createHtmlForEventName(eventInfo)}`; // スペース1つ分の余白を付けてデザインの微調整
+
+    if (participants.length !== 0) {
+        body += createHtmlForEventParticipant(date, participants);
+    }
+    return `<div>${body}</div>`;
 };
 
 const createHtmlForEventList = (eventInfoList: EventInfo[], date: Date): string => {
     const title = `<div>【 ${formatDate(date, 'yyyy-MM-dd')} の予定 】</div>`;
     const regularEventList: EventInfo[] = [];
-    const allDayEventList: EventInfo[] = []; // 終日予定
+    const allDayEventList: EventInfo[] = [];
 
     eventInfoList.forEach(eventInfo => {
         if (eventInfo.eventType === 'REGULAR' || eventInfo.eventType === 'REPEATING') {
             regularEventList.push(eventInfo);
         } else if (eventInfo.eventType === 'ALL_DAY') {
             allDayEventList.push(eventInfo);
-        } else {
-            console.log(eventInfo);
         }
     });
 
@@ -66,16 +89,16 @@ const createHtmlForEventList = (eventInfoList: EventInfo[], date: Date): string 
     body += regularEventList
         .map(eventInfo => {
             if (isAlldayInRegularEvent(eventInfo)) {
-                return `<div>${createHtmlForItem(eventInfo, date)}</div>`;
+                return createHtmlForAllDayEvent(eventInfo);
             } else {
-                return createHtmlForItemWithTimeRange(eventInfo, date);
+                return createHtmlForRegularEvent(eventInfo, date);
             }
         })
         .join('');
 
     if (allDayEventList.length !== 0) {
         body += '<br><div>［終日予定］</div>';
-        body += allDayEventList.map(eventInfo => `<div>${createHtmlForItem(eventInfo, date)}</div>`).join('');
+        body += allDayEventList.map(eventInfo => createHtmlForAllDayEvent(eventInfo)).join('');
     }
     return body;
 };
@@ -83,15 +106,13 @@ const createHtmlForEventList = (eventInfoList: EventInfo[], date: Date): string 
 const createHtmlForMyGroupEventList = (myGroupEventList: MyGroupEvent[], date: Date): string => {
     const title = `<div>【 ${formatDate(date, 'yyyy-MM-dd')} の予定 】</div>`;
     const regularEventList: MyGroupEvent[] = [];
-    const allDayEventList: MyGroupEvent[] = []; // 終日予定
+    const allDayEventList: MyGroupEvent[] = [];
 
     myGroupEventList.forEach(groupEvent => {
         if (groupEvent.eventInfo.eventType === 'REGULAR' || groupEvent.eventInfo.eventType === 'REPEATING') {
             regularEventList.push(groupEvent);
         } else if (groupEvent.eventInfo.eventType === 'ALL_DAY') {
             allDayEventList.push(groupEvent);
-        } else {
-            console.log(groupEvent);
         }
     });
 
@@ -99,18 +120,16 @@ const createHtmlForMyGroupEventList = (myGroupEventList: MyGroupEvent[], date: D
     body += regularEventList
         .map(groupEvent => {
             if (isAlldayInRegularEvent(groupEvent.eventInfo)) {
-                return `<div>${createHtmlForItem(groupEvent.eventInfo, date, groupEvent.participants)}</div>`;
+                return createHtmlForAllDayEvent(groupEvent.eventInfo);
             } else {
-                return createHtmlForItemWithTimeRange(groupEvent.eventInfo, date, groupEvent.participants);
+                return createHtmlForRegularEvent(groupEvent.eventInfo, date, groupEvent.participants);
             }
         })
         .join('');
 
     if (allDayEventList.length !== 0) {
         body += '<br><div>［終日予定］</div>';
-        body += allDayEventList
-            .map(groupEvent => `<div>${createHtmlForItem(groupEvent.eventInfo, date, groupEvent.participants)}</div>`)
-            .join('');
+        body += allDayEventList.map(groupEvent => createHtmlForAllDayEvent(groupEvent.eventInfo)).join('');
     }
     return body;
 };

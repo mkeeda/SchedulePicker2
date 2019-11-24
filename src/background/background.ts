@@ -137,7 +137,7 @@ const setupContextMenus = async (): Promise<void> => {
 
     chrome.contextMenus.onClicked.addListener((info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) => {
         chrome.storage.sync.get(
-            [StorageKeys.IS_PRIVATE, StorageKeys.DATE, StorageKeys.TEMPLATE_TEXT, StorageKeys.DATE_TYPE],
+            [StorageKeys.IS_INCLUDE_PRIVATE_EVENT, StorageKeys.DATE, StorageKeys.TEMPLATE_TEXT, StorageKeys.DATE_TYPE],
             async items => {
                 // FIXME: radioボタンが選択されたときのイベントと、API接続系のイベントを１つのswitch文で分岐している設計がよろしくない
                 // FIXME: try/catchの範囲がでかすぎるので上記の対応をしたあとに適切な例外を投げる
@@ -151,7 +151,7 @@ const setupContextMenus = async (): Promise<void> => {
                                 toDateFromString(items.date),
                                 publicHolidays
                             );
-                            const eventInfoList = await logic.getSortedMyEvents(dateRange, items.isPrivate);
+                            const eventInfoList = await logic.getSortedMyEvents(dateRange, items.isIncludePrivateEvent);
                             chrome.tabs.sendMessage(tab!.id!, {
                                 eventType: EventsType.MY_EVENTS,
                                 dateStr: dateRange.startDate.toString(),
@@ -167,7 +167,7 @@ const setupContextMenus = async (): Promise<void> => {
                                 toDateFromString(items.date),
                                 publicHolidays
                             );
-                            const eventInfoList = await logic.getSortedMyEvents(dateRange, items.isPrivate);
+                            const eventInfoList = await logic.getSortedMyEvents(dateRange, items.isIncludePrivateEvent);
                             chrome.tabs.sendMessage(tab!.id!, {
                                 eventType: EventsType.TEMPLATE,
                                 dateStr: dateRange.startDate.toString(),
@@ -207,7 +207,7 @@ const setupContextMenus = async (): Promise<void> => {
                             );
                             const myGroupEventList = await logic.getMyGroupEvents(
                                 dateRange,
-                                items.isPrivate,
+                                items.isIncludePrivateEvent,
                                 info.menuItemId
                             );
                             chrome.tabs.sendMessage(tab!.id!, {

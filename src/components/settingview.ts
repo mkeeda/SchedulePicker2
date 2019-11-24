@@ -1,6 +1,6 @@
 import { LitElement, html, css, property, customElement, TemplateResult } from 'lit-element';
 import { StorageKeys } from '../background/eventtype';
-import './privateschedule';
+import './changeshowprivateevent';
 import './selectdate';
 import './editabletemplate';
 import './savebutton';
@@ -8,7 +8,7 @@ import './savebutton';
 @customElement('setting-view')
 export class SettingView extends LitElement {
     @property({ type: Boolean })
-    isPrivate = false;
+    isIncludePrivateEvent = true;
 
     @property({ type: String })
     date = '';
@@ -22,23 +22,26 @@ export class SettingView extends LitElement {
     }
 
     private initProperties = (): void => {
-        chrome.storage.sync.get([StorageKeys.IS_PRIVATE, StorageKeys.DATE, StorageKeys.TEMPLATE_TEXT], item => {
-            if (item.isPrivate != null) {
-                this.isPrivate = item.isPrivate;
-            }
+        chrome.storage.sync.get(
+            [StorageKeys.IS_INCLUDE_PRIVATE_EVENT, StorageKeys.DATE, StorageKeys.TEMPLATE_TEXT],
+            item => {
+                if (item.isIncludePrivateEvent != null) {
+                    this.isIncludePrivateEvent = item.isIncludePrivateEvent;
+                }
 
-            if (item.date != null) {
-                this.date = item.date;
-            }
+                if (item.date != null) {
+                    this.date = item.date;
+                }
 
-            if (item.templateText != null) {
-                this.templateText = item.templateText;
+                if (item.templateText != null) {
+                    this.templateText = item.templateText;
+                }
             }
-        });
+        );
     };
 
     onClickedCheckbox = (e): void => {
-        this.isPrivate = e.currentTarget.checked;
+        this.isIncludePrivateEvent = e.currentTarget.checked;
     };
 
     onSelectedDate = (e): void => {
@@ -51,7 +54,7 @@ export class SettingView extends LitElement {
 
     onClickedSave = (): void => {
         chrome.storage.sync.set({
-            isPrivate: this.isPrivate,
+            isIncludePrivateEvent: this.isIncludePrivateEvent,
             date: this.date,
             templateText: this.templateText,
         });
@@ -60,10 +63,10 @@ export class SettingView extends LitElement {
     render(): TemplateResult {
         return html`
             <main>
-                <private-schedule
-                    .isPrivate=${this.isPrivate}
+                <change-show-private-event
+                    .isIncludePrivateEvent=${this.isIncludePrivateEvent}
                     .onClickedCheckbox=${this.onClickedCheckbox}
-                ></private-schedule>
+                ></change-show-private-event>
                 <select-date .date=${this.date} .onSelectedDate=${this.onSelectedDate}></select-date>
                 <editable-template
                     .templateText=${this.templateText}

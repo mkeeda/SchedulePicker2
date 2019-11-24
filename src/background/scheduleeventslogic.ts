@@ -7,15 +7,20 @@ import * as util from './util';
 import { DateRange } from '../types/date';
 
 interface ScheduleEventsLogic {
-    getMyEvents(dateRange: DateRange, isPrivate: boolean, targetType: string, target: string): Promise<EventInfo[]>;
+    getMyEvents(
+        dateRange: DateRange,
+        isIncludePrivateEvent: boolean,
+        targetType: string,
+        target: string
+    ): Promise<EventInfo[]>;
     getSortedMyEvents(
         dateRange: DateRange,
-        isPrivate: boolean,
+        isIncludePrivateEvent: boolean,
         targetType: string,
         target: string
     ): Promise<EventInfo[]>;
     getMyGroups(): Promise<base.MyGroupType[]>;
-    getMyGroupEvents(dateRange: DateRange, isPrivate: boolean, groupId: string): Promise<MyGroupEvent[]>;
+    getMyGroupEvents(dateRange: DateRange, isIncludePrivateEvent: boolean, groupId: string): Promise<MyGroupEvent[]>;
     getNarrowedDownPublicHolidays(specificDate: Date): Promise<string[]>;
 }
 
@@ -26,27 +31,36 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         this.garoonDataSource = new GaroonDataSourceImpl(domain);
     }
 
-    async getMyEvents(dateRange: DateRange, isPrivate: boolean, targetType = '', target = ''): Promise<EventInfo[]> {
+    async getMyEvents(
+        dateRange: DateRange,
+        isIncludePrivateEvent: boolean,
+        targetType = '',
+        target = ''
+    ): Promise<EventInfo[]> {
         const events = await this.garoonDataSource.getScheduleEvents(
             dateRange.startDate.toISOString(),
             dateRange.endDate.toISOString(),
             targetType,
             target
         );
-        if (isPrivate) {
-            return events.filter(event => event.visibilityType !== 'PRIVATE');
-        } else {
-            return events;
-        }
+        return events.filter(event => {
+            let isIncludeEvent = true;
+
+            if (!isIncludePrivateEvent) {
+                isIncludeEvent = event.visibilityType !== 'PRIVATE';
+            }
+
+            return isIncludeEvent;
+        });
     }
 
     async getSortedMyEvents(
         dateRange: DateRange,
-        isPrivate: boolean,
+        isIncludePrivateEvent: boolean,
         targetType = '',
         target = ''
     ): Promise<EventInfo[]> {
-        const eventInfoList = await this.getMyEvents(dateRange, isPrivate, targetType, target);
+        const eventInfoList = await this.getMyEvents(dateRange, isIncludePrivateEvent, targetType, target);
         return eventInfoList.sort(util.sortByTimeFunc);
     }
 
@@ -57,7 +71,11 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         return this.garoonDataSource.getMyGroupsById(myGroupIds);
     }
 
-    async getMyGroupEvents(dateRange: DateRange, isPrivate: boolean, groupId: string): Promise<MyGroupEvent[]> {
+    async getMyGroupEvents(
+        dateRange: DateRange,
+        isIncludePrivateEvent: boolean,
+        groupId: string
+    ): Promise<MyGroupEvent[]> {
         const myGroups = await this.getMyGroups();
         const targetMyGroups = myGroups.filter(g => g.key === groupId);
 
@@ -76,7 +94,7 @@ export default class ScheduleEventsLogicImpl implements ScheduleEventsLogic {
         */
         const eventInfoPerUserList = await Promise.all(
             groupMemberList.map(async userId => {
-                const eventInfoList = await this.getMyEvents(dateRange, isPrivate, 'user', userId);
+                const eventInfoList = await this.getMyEvents(dateRange, isIncludePrivateEvent, 'user', userId);
                 return eventInfoList;
             })
         );

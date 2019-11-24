@@ -26,7 +26,7 @@ export enum EventsType {
 }
 
 export enum StorageKeys {
-    IS_PRIVATE = 'isPrivate',
+    IS_INCLUDE_PRIVATE_EVENT = 'isIncludePrivateEvent',
     DATE = 'date',
     TEMPLATE_TEXT = 'templateText',
     DATE_TYPE = 'dateType', // 日付のタイプ

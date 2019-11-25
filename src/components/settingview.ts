@@ -18,7 +18,7 @@ export class SettingView extends LitElement {
     date = '';
 
     @property({ type: String })
-    templateText = '';
+    templateText = `今日の予定を取得できるよ<br>{%TODAY%}<div><br><div>翌営業日の予定を取得できるよ<br>{%NEXT_BUSINESS_DAY%}</div><div><br></div><div>前営業日の予定を取得できるよ<br>{%PREVIOUS_BUSINESS_DAY%}</div></div>`;
 
     constructor() {
         super();

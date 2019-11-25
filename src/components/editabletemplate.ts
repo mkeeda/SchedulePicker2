@@ -17,7 +17,7 @@ export class EditableTemplate extends LitElement {
                 <div
                     class="input-form"
                     contenteditable="true"
-                    .textContent=${this.templateText}
+                    .innerHTML=${this.templateText}
                     @blur=${this.onBlurTemplate}
                 ></div>
             </div>

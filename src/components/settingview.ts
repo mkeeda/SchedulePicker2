@@ -66,7 +66,7 @@ export class SettingView extends LitElement {
     };
 
     onBlurTemplate = (e): void => {
-        this.templateText = e.currentTarget.textContent;
+        this.templateText = e.currentTarget.innerHTML;
     };
 
     onClickedSave = (): void => {

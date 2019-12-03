@@ -294,6 +294,7 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 });
 
 chrome.runtime.onInstalled.addListener(() => {
+    // TODO: popupとかで設定した初期値をインストール時にセットしてあげる必要がある
     chrome.storage.sync.set({ dateType: DateType.TODAY });
 });
 

@@ -15,9 +15,6 @@ export class SettingView extends LitElement {
     isIncludeAllDayEvent = true;
 
     @property({ type: String })
-    date = '';
-
-    @property({ type: String })
     templateText = `今日の予定を取得できるよ<br>{%TODAY%}<div><br><div>翌営業日の予定を取得できるよ<br>{%NEXT_BUSINESS_DAY%}</div><div><br></div><div>前営業日の予定を取得できるよ<br>{%PREVIOUS_BUSINESS_DAY%}</div></div>`;
 
     constructor() {
@@ -27,12 +24,7 @@ export class SettingView extends LitElement {
 
     private initProperties = (): void => {
         chrome.storage.sync.get(
-            [
-                StorageKeys.IS_INCLUDE_PRIVATE_EVENT,
-                StorageKeys.IS_INCLUDE_ALL_DAY_EVENT,
-                StorageKeys.DATE,
-                StorageKeys.TEMPLATE_TEXT,
-            ],
+            [StorageKeys.IS_INCLUDE_PRIVATE_EVENT, StorageKeys.IS_INCLUDE_ALL_DAY_EVENT, StorageKeys.TEMPLATE_TEXT],
             item => {
                 if (item.isIncludePrivateEvent != null) {
                     this.isIncludePrivateEvent = item.isIncludePrivateEvent;
@@ -40,10 +32,6 @@ export class SettingView extends LitElement {
 
                 if (item.isIncludeAllDayEvent != null) {
                     this.isIncludeAllDayEvent = item.isIncludeAllDayEvent;
-                }
-
-                if (item.date != null) {
-                    this.date = item.date;
                 }
 
                 if (item.templateText != null) {
@@ -61,10 +49,6 @@ export class SettingView extends LitElement {
         this.isIncludeAllDayEvent = e.currentTarget.checked;
     };
 
-    onSelectedDate = (e): void => {
-        this.date = e.currentTarget.value;
-    };
-
     onBlurTemplate = (e): void => {
         this.templateText = e.currentTarget.innerHTML;
     };
@@ -73,7 +57,6 @@ export class SettingView extends LitElement {
         chrome.storage.sync.set({
             isIncludePrivateEvent: this.isIncludePrivateEvent,
             isIncludeAllDayEvent: this.isIncludeAllDayEvent,
-            date: this.date,
             templateText: this.templateText,
         });
     };
@@ -89,7 +72,6 @@ export class SettingView extends LitElement {
                     .isIncludeEvent=${this.isIncludeAllDayEvent}
                     .onClickedCheckbox=${this.onChangeShowAllDayEvent}
                 ></change-show-all-day-event>
-                <select-date .date=${this.date} .onSelectedDate=${this.onSelectedDate}></select-date>
                 <editable-template
                     .templateText=${this.templateText}
                     .onBlurTemplate=${this.onBlurTemplate}

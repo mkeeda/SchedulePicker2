@@ -9,14 +9,13 @@ import './savebutton';
 @customElement('setting-view')
 export class SettingView extends LitElement {
     @property({ type: Boolean })
-    isIncludePrivateEvent = true;
+    isIncludePrivateEvent;
 
     @property({ type: Boolean })
-    isIncludeAllDayEvent = true;
+    isIncludeAllDayEvent;
 
     @property({ type: String })
-    templateText = `今日の予定を取得できるよ<br>{%TODAY%}<div><br><div>翌営業日の予定を取得できるよ<br>{%NEXT_BUSINESS_DAY%}</div><div><br></div><div>前営業日の予定を取得できるよ<br>{%PREVIOUS_BUSINESS_DAY%}</div></div>`;
-
+    templateText;
     constructor() {
         super();
         this.initProperties();
@@ -26,17 +25,9 @@ export class SettingView extends LitElement {
         chrome.storage.sync.get(
             [StorageKeys.IS_INCLUDE_PRIVATE_EVENT, StorageKeys.IS_INCLUDE_ALL_DAY_EVENT, StorageKeys.TEMPLATE_TEXT],
             item => {
-                if (item.isIncludePrivateEvent != null) {
-                    this.isIncludePrivateEvent = item.isIncludePrivateEvent;
-                }
-
-                if (item.isIncludeAllDayEvent != null) {
-                    this.isIncludeAllDayEvent = item.isIncludeAllDayEvent;
-                }
-
-                if (item.templateText != null) {
-                    this.templateText = item.templateText;
-                }
+                this.isIncludePrivateEvent = item.isIncludePrivateEvent;
+                this.isIncludeAllDayEvent = item.isIncludeAllDayEvent;
+                this.templateText = item.templateText;
             }
         );
     };

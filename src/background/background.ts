@@ -294,8 +294,12 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 });
 
 chrome.runtime.onInstalled.addListener(() => {
-    // TODO: popupとかで設定した初期値をインストール時にセットしてあげる必要がある
-    chrome.storage.sync.set({ dateType: DateType.TODAY });
+    chrome.storage.sync.set({
+        dateType: DateType.TODAY,
+        isIncludePrivateEvent: true,
+        isIncludeAllDayEvent: true,
+        templateText: `今日の予定を取得できるよ<br>{%TODAY%}<div><br><div>翌営業日の予定を取得できるよ<br>{%NEXT_BUSINESS_DAY%}</div><div><br></div><div>前営業日の予定を取得できるよ<br>{%PREVIOUS_BUSINESS_DAY%}</div></div>`,
+    });
 });
 
 setupContextMenus();

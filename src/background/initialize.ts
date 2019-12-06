@@ -3,6 +3,12 @@ import { ContextMenuParentId, ContextMenuDateId, ContextMenuActionId } from './d
 import { ContextMenuHelper } from './contextmenuhelper';
 import { ContextMenu } from 'src/types/contextmenu';
 
+const isIncludePrivateEvent = true; // 非公開予定を出力結果に含む
+
+const isIncludeAllDayEvent = true; // 終日予定を出力結果に含む
+
+const TEMPLATE_TEXT = `今日の予定を取得できるよ<br>{%TODAY%}<div><br><div>翌営業日の予定を取得できるよ<br>{%NEXT_BUSINESS_DAY%}</div><div><br></div><div>前営業日の予定を取得できるよ<br>{%PREVIOUS_BUSINESS_DAY%}</div></div>`;
+
 const showPopupWindow = (): void => {
     window.open('../calendar.html', 'extension_calendar', 'width=300, height=100, status=no');
 };
@@ -59,10 +65,19 @@ const defaultMenuItems: ContextMenu[] = [
     },
 ];
 
-const setupContext = (): void => {
+const setupContextMenu = (): void => {
     defaultMenuItems.forEach(item => {
         ContextMenuHelper.addMenu(item);
     });
 };
 
-setupContext();
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.storage.sync.set({
+        dateType: DateType.TODAY,
+        isIncludePrivateEvent: isIncludePrivateEvent,
+        isIncludeAllDayEvent: isIncludeAllDayEvent,
+        templateText: TEMPLATE_TEXT,
+    });
+
+    setupContextMenu();
+});
